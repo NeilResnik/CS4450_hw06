@@ -1,3 +1,15 @@
+## DESIGN DECISIONS:
+
+ - react tries to prevent invalid inputs as the user types
+ - elixir double checks that guesses are valid
+ - elixir ensures game is playing before accepting a guess 
+  - does not accept if game is over
+ - elixir state stores
+  - answer (the num to guess)
+  - guessHistory (list of guesses and their results)
+  - gameState (playing, won, or lost)
+
+
 # Bulls
 
 To start your Phoenix server:
