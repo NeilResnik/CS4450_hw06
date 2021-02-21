@@ -1,0 +1,25 @@
+
+Game Name -> channel
+    socket.channel("game:<game name>", {user: <user as string>})
+
+Lobby:
+    3 States: Ready, Not Ready, Observe - all are sent to server when changed, starts in not ready
+Game:
+    Guess send format: 
+        List of Strings (each string = 1 letter)
+
+    view:
+    {
+        Users: List of Strings,
+        Observers: List of Strings,
+        Guesses: List of (Maps of 
+            {
+                User: string,
+                Guess: string,
+                Bulls: number,
+                Cows: number
+            }), each map = round, front/lower index = more recent
+    }
+
+    Timer: Seperate instances on each side, client resets timer when state is received
+    (use broadcast serverside)
