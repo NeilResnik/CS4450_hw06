@@ -10,63 +10,109 @@ import {Socket} from "phoenix"
 
 let socket = new Socket("/socket", {params: {token: ""}})
 
-socket.connect();
+// When you connect, you'll often need to authenticate the client.
+// For example, imagine you have an authentication plug, `MyAuth`,
+// which authenticates the session and assigns a `:current_user`.
+// If the current user exists you can assign the user's token in
+// the connection for use in the layout.
+//
+// In your "lib/web/router.ex":
+//
+//     pipeline :browser do
+//       ...
+//       plug MyAuth
+//       plug :put_user_token
+//     end
+//
+//     defp put_user_token(conn, _) do
+//       if current_user = conn.assigns[:current_user] do
+//         token = Phoenix.Token.sign(conn, "user socket", current_user.id)
+//         assign(conn, :user_token, token)
+//       else
+//         conn
+//       end
+//     end
+//
+// Now you need to pass this token to JavaScript. You can do so
+// inside a script tag in "lib/web/templates/layout/app.html.eex":
+//
+//     <script>window.userToken = "<%= assigns[:user_token] %>";</script>
+//
+// You will need to verify the user token in the "connect/3" function
+// in "lib/web/channels/user_socket.ex":
+//
+//     def connect(%{"token" => token}, socket, _connect_info) do
+//       # max_age: 1209600 is equivalent to two weeks in seconds
+//       case Phoenix.Token.verify(socket, "user socket", token, max_age: 1209600) do
+//         {:ok, user_id} ->
+//           {:ok, assign(socket, :user, user_id)}
+//         {:error, reason} ->
+//           :error
+//       end
+//     end
+//
+// Finally, connect to the socket:
+socket.connect()
 
-let channel = socket.channel("game:1", {});
+// Now that you are connected, you can join channels with a topic:
+let channel = socket.channel("game:1", {})
 
+// Based on Nat Tuck's code at
+//https://github.com/NatTuck/scratch-2021-01/blob/master/4550/0216/hangman/assets/js/socket.js
 let state = {
-  guessHistory: [],
-  gameState: "playing",
+    guesses: [],
+    results: [],
 };
 
 let callback = null;
 
-// also pad the state with empty if needed
+function convert_state(st) {
+    let guesses = [];
+    let results = [];
+    for (const record of st.guessHistory){
+        if(record.guess) {
+            guesses.unshift(record.guess);
+        }
+        if(record.bulls && record.cows) {
+            results.unshift(record.bulls + "A" + record.cows + "B");
+        }
+    }
+    return {
+        guesses: guesses,
+        results: results
+    }
+}
+
 function state_update(st) {
-  console.log("NEW STATE", st);
-  state = pad(st);
-  if (callback) {
-    callback(st);
-  }
+    st = convert_state(st)
+    state = st;
+    console.log(state)
+    if(callback) {
+      callback(st);
+    }
 }
 
-function pad(st) {
-  let newHistory = st.guessHistory.slice(0)
-  newHistory.reverse()
-
-  const missing = 8 - newHistory.length;
-  var i;
-
-  for (i = 0; i < missing; ++i) {
-    newHistory.push({
-      guess: null,
-      bulls: null,
-      cows: null,
-    })
-  }
-
-  console.log(Object.assign({}, st, {guessHistory: newHistory}))
-  return Object.assign({}, st, {guessHistory: newHistory})
+export function ch_join(cb){
+    callback = cb;
+    callback(state);
 }
 
-export function ch_join(cb) {
-  callback = cb;
-  callback(state);
+export function ch_push(guess){
+    channel.push("guess", guess)
+           .receive("ok", state_update)
+           .receive("error", (resp) => {
+             console.log("Unable to push:", resp)
+           });
 }
 
-export function ch_guess(guess) {
-  channel.push("guess", guess)
-    .receive("ok", state_update)
-    .receive("error", resp => {console.log("ch_guess broke", resp)});
+export function ch_reset(){
+    channel.push("reset", {})
+           .receive("ok", state_update)
+           .receive("error", (resp) => {
+             console.log("Unable to reset:", resp)
+           });
 }
-
-export function ch_reset() {
-  channel.push("reset", [])
-    .receive("ok", state_update)
-    .receive("error", resp => {console.log("ch_reset broke", resp)});
-}
-
 
 channel.join()
-  .receive("ok", state_update)
-  .receive("error", resp => {console.log("unable to join", resp)});
+       .receive("ok", state_update)
+       .receive("error", resp => { console.log("Unable to join:", resp) })

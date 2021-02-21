@@ -1,7 +1,8 @@
 // We need to import the CSS so that webpack will load it.
 // The MiniCssExtractPlugin is used to separate it out into
 // its own CSS file.
-import "../css/app.css"
+import 'bulma/css/bulma.css'
+import '../css/app.scss'
 
 // webpack automatically bundles all modules in your
 // entry points. Those entry points can be configured
@@ -12,12 +13,12 @@ import "../css/app.css"
 //     import {Socket} from "phoenix"
 //     import socket from "./socket"
 //
-import "phoenix_html"
+import 'phoenix_html'
 
-import React, { useState } from 'react';
-import ReactDOM from 'react-dom';
+import React, { useState } from 'react'
+import ReactDOM from 'react-dom'
 
-import Bulls from './Bulls';
+import Bulls from './Bulls'
 
 ReactDOM.render(
   <React.StrictMode>
