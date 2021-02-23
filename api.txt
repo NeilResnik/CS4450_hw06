@@ -2,6 +2,22 @@
 Game Name -> channel
     socket.channel("game:<game name>", {user: <user as string>})
 
+
+
+
+SOCKET MESSAGES:
+"joinGame", {game: gamename, user: name} -> user types in game name, either creates new game or joins running game
+                                        -> if user exists in game, become that user?
+                                        -> if game is "playing", no menu for choosing observer or player, automatically an observer
+"modifyUser", {user: name, player: boolean} -> call to change a user player | observer
+                                            -> call to set player to ready or unready
+"readyUp", {user: name, ready: boolean} -> call to toggle if a player is ready (toggle only visible if user is a player?)
+"guess", guess ->  called when a user guesses
+
+
+
+
+
 Lobby:
     3 States: Ready, Not Ready, Observe - all are sent to server when changed, starts in not ready
 Game:
@@ -22,15 +38,45 @@ Game:
     }
 
     view2 {
-        users:
+        players:
         [
             'name': [{
                 guess: string,
                 bulls: number,
                 cows: number
-            }]
-        ]
+            }],
+            'ready': boolean
+        ],
+
+        gameState: "waiting" || "playing"
     }
+
+
+    GAME STATES: "waiting", "playing"
+     - server tells the clients if they should display the lobby or the game
 
     Timer: Seperate instances on each side, client resets timer when state is received
     (use broadcast serverside)
+
+
+
+
+
+Internal Server state (game.ex):
+
+{
+    players: [{
+        'name': [{
+                guess: string,
+                bulls: number,
+                cows: number
+            }]
+        ],
+        'ready': boolean
+
+    }]
+    observers: ['name', 'name', 'name' ...]
+    gameState: "waiting" || "playing"
+    answer: ["#", "#", "#", "#"]
+    gameName: name
+}
