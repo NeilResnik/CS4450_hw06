@@ -21,5 +21,21 @@ Game:
             }), each map = round, front/lower index = more recent
     }
 
+    view2 {
+        user1: [{
+            guess: string,
+            bulls: number,
+            cows: number
+        }],
+        
+        ...
+
+        userN: [{
+            guess: string,
+            bulls: numbber,
+            cows: number
+        }]
+    }
+
     Timer: Seperate instances on each side, client resets timer when state is received
     (use broadcast serverside)

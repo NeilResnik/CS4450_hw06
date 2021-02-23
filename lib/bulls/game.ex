@@ -11,11 +11,26 @@
 # validateGuess -> check for no repeating vals
 defmodule Bulls.Game do
 
-    def new do
+    # I think that game state should store players
+    # each player has a game history
+    # 
+    def new(name) do
         %{
             guessHistory: [],
             gameState: "playing",
             answer: randomAnswer([]),
+            gameName: name,
+            players: []
+        }
+
+        # OR
+
+        # gameState one of readyUp, playing
+        % {
+            players: []
+            gameState: "readyUp"
+            answer: randomAnswer([])
+            gameName: name
         }
     end
 
