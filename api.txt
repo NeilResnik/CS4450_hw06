@@ -22,20 +22,42 @@ Game:
     }
 
     view2 {
-        user1: [{
-            guess: string,
-            bulls: number,
-            cows: number
-        }],
-        
-        ...
+        users:
+        [
+            'name': [{
+                guess: string,
+                bulls: number,
+                cows: number
+            }]
+        ],
 
-        userN: [{
-            guess: string,
-            bulls: numbber,
-            cows: number
-        }]
+        gameState: "waiting" || "playing"
     }
+
+
+    GAME STATES: "waiting", "playing"
+     - server tells the clients if they should display the lobby or the game
 
     Timer: Seperate instances on each side, client resets timer when state is received
     (use broadcast serverside)
+
+
+
+
+
+Internal Server state (game.ex):
+
+{
+    users: [{
+        'name': [{
+                guess: string,
+                bulls: number,
+                cows: number
+            }]
+        ],
+
+    }]
+    gameState: "waiting" || "playing"
+    answer: ["#", "#", "#", "#"]
+    gameName: name
+}
