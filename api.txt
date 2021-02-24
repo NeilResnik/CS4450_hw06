@@ -43,7 +43,7 @@ Game:
                         guess: string,
                         bulls: number,
                         cows: number
-                    }]
+                    }] or nil if observer
         players:
         [{
             id: {
