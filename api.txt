@@ -6,7 +6,8 @@ Game Name -> channel
 
 
 SOCKET MESSAGES:
-"joinGame", {game: gamename, user: name} -> user types in game name, either creates new game or joins running game
+"game:<game name>", {user: <user as string>} -> this is sent on channel.join(), move the channel.join() call in ch_join()
+                                        -> user types in game name, either creates new game or joins running game
                                         -> if user exists in game, become that user?
                                         -> if game is "playing", no menu for choosing observer or player, automatically an observer
 "modifyUser", {user: name, player: boolean} -> call to change a user player | observer
