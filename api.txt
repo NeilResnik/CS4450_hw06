@@ -1,4 +1,3 @@
-
 Game Name -> channel
     socket.channel("game:<game name>", {user: <user as string>})
 
@@ -6,14 +5,15 @@ Game Name -> channel
 
 
 SOCKET MESSAGES:
-"game:<game name>", {user: <user as string>} -> this is sent on channel.join(), move the channel.join() call in ch_join()
+"game:<game name>", {user: <user as string>} -> sent by channel.join(), move channel.join() into ch_join(gameName, user)
                                         -> user types in game name, either creates new game or joins running game
                                         -> if user exists in game, become that user?
                                         -> if game is "playing", no menu for choosing observer or player, automatically an observer
-"modifyUser", {user: name, player: boolean} -> call to change a user player | observer
-                                            -> call to set player to ready or unready
-"readyUp", {user: name, ready: boolean} -> call to toggle if a player is ready (toggle only visible if user is a player?)
-"guess", guess ->  called when a user guesses
+"modifyUser", {player: boolean} -> call to change a user player | observer
+    -> "ok" response if all good
+    -> "tooManyUsers" response if it would cause more than 4 players
+"readyUp", {ready: boolean} -> call to toggle if a player is ready (toggle only visible if user is a player?)
+"guess", [guessArr] ->  called when a user guesses
 
 
 
