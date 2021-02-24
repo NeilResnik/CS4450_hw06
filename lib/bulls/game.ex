@@ -27,8 +27,13 @@ defmodule Bulls.Game do
 
         # gameState one of readyUp, playing
         % {
-            players: []
-            gameState: "readyUp"
+            players: [{
+                guess:,
+                bulls:,
+                cows:,
+            }],
+            observers([])
+            gameState: "waiting"
             answer: randomAnswer([])
             gameName: name
         }
