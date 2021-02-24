@@ -39,6 +39,11 @@ Game:
     }
 
     view2 {
+        user: [{
+                        guess: string,
+                        bulls: number,
+                        cows: number
+                    }]
         players:
         [{
             id: {
