@@ -45,7 +45,7 @@ Game:
                         cows: number
                     }] or nil if observer
         players:
-        [{
+        {
             id: {
                     'user': string,
                     'ready': bool,
@@ -55,8 +55,8 @@ Game:
                         cows: number
                     }]
                 }
-        }],
-        observers: [{id: int, user: string}]
+        },
+        observers: { id: username }
 
         gameState: "waiting" || "playing"
     }
