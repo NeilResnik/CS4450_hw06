@@ -39,11 +39,7 @@ Game:
     }
 
     view2 {
-        user: [{
-                        guess: string,
-                        bulls: number,
-                        cows: number
-                    }] or nil if observer
+        user: userId
         players:
         {
             id: {
