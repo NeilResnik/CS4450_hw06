@@ -54,16 +54,9 @@ let socket = new Socket("/socket", {params: {token: ""}})
 // Finally, connect to the socket:
 socket.connect()
 
-// Now that you are connected, you can join channels with a topic:
-let channel = socket.channel("game:1", {})
-
 // Based on Nat Tuck's code at
 //https://github.com/NatTuck/scratch-2021-01/blob/master/4550/0216/hangman/assets/js/socket.js
-let state = {
-    guesses: [],
-    results: [],
-};
-
+let channel = null;
 let callback = null;
 
 function convert_state(st) {
@@ -83,18 +76,16 @@ function convert_state(st) {
     }
 }
 
-function state_update(st) {
-    st = convert_state(st)
-    state = st;
+function state_update(state) {
     console.log(state)
     if(callback) {
-      callback(st);
+      callback(state);
     }
 }
 
-export function ch_join(cb){
+export function ch_join(gameName, user, cb){
+    channel = socket.channel(gameName, {name: user})
     callback = cb;
-    callback(state);
 }
 
 export function ch_push(guess){
@@ -116,3 +107,4 @@ export function ch_reset(){
 channel.join()
        .receive("ok", state_update)
        .receive("error", resp => { console.log("Unable to join:", resp) })
+
