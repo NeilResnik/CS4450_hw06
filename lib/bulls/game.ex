@@ -26,8 +26,28 @@ defmodule Bulls.Game do
 
     # return a user safe state
     # TODO modify view to have user: players:
-    def view(userId, st) do
+    def view(st) do
         Map.delete(st, :answer)
+    end
+
+    # is all players ready?
+    def allReady?(st) do
+        Enum.reduce(st.players, true, fn({_id, info}, acc) ->
+            acc and info.ready
+        end) and (Enum.count(st.players) > 0)
+    end
+
+    # change a player between ready or not
+    # do nothing if id is an observer
+    # st: game
+    # userId: int 
+    # ready: bool
+    def setReady(st, userId, ready) do
+        if Map.has_key?(st.players, userId) do
+            %{st | players: %{st.players | (userId) => %{st.players[userId] | ready: ready}}}
+        else
+            st
+        end
     end
 
     # TODO modify a user!

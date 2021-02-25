@@ -19,7 +19,8 @@ defmodule BullsWeb.GameChannel do
       # get the game!
       game = GameServer.peek(name)
       # get a reduced state (no answer)
-      view = Game.view(user, game)
+      view = Game.view(game)
+      broadcast(socket, "view", view)
       {:ok, view, socket}
     else
       {:error, %{reason: "unauthorized"}}
@@ -37,7 +38,8 @@ defmodule BullsWeb.GameChannel do
     game1 = Game.guess(game0, guessArr)
     socket1 = assign(socket0, :game, game1)
     view = Game.view(game1)
-    {:reply, {:ok, view}, socket1}
+    # decide what to send back to the user (do not reveal guesses)
+    {:ok, view, socket}
   end
 
   # It is also common to receive messages from the client and
@@ -53,14 +55,41 @@ defmodule BullsWeb.GameChannel do
 
     # if game not nil, return ok status
     if game do
-      view = Game.view(userId, game)
+      view = Game.view(game)
+      broadcast(socket, "view", view)
       {:reply, {:ok, view}, socket}
     else
       # get default game
       game1 = GameServer.peek(name)
-      view = Game.view(userId, game1)
+      view = Game.view(game1)
       {:reply, {:tooManyPlayers, view}, socket}
     end
+  end
+
+  # set a user status as ready!
+  @impl true
+  def handle_in("readyUp", payload, socket) do
+    # get the user id and game name
+    name = socket.assigns[:game]
+    userId = socket.assigns[:user]
+
+    game = GameServer.setReady(name, userId, payload.ready)
+
+    view = Game.view(game)
+
+    broadcast(socket, "view", view)
+    {:reply, {:ok, view}, socket}
+  end
+
+
+  intercept ["view"]
+
+  @impl true
+  def handle_out("view", msg, socket) do
+    userId = socket.assigns[:user]
+    msg = %{msg | user: userId}
+    push(socket, "view", msg)
+    {:noreply, socket}
   end
 
   # Add authorization logic here as required.

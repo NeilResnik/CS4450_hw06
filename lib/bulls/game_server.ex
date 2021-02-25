@@ -59,6 +59,15 @@ defmodule Bulls.GameServer do
     GenServer.call(reg(name), {:modifyUser, name, userId, player})
   end
 
+
+  # set a player as ready or not, do nothing if observer
+  # name: string: game name
+  # userId: int: id of user
+  # ready: boolean, true if ready, false if not
+  def setReady(name, userId, ready) do
+    GenServer.call(reg(name), {:setReady, name, userId, ready})
+  end
+
   # implementation
 
   # modify this to do theeeeeee auto guess and show guesses states
@@ -92,11 +101,18 @@ defmodule Bulls.GameServer do
   end
 
   # toggle user from player to observer or vice versa
-  def handle_call({:modifyUser, name, userId, player}), _from, game) do
+  def handle_call({:modifyUser, name, userId, player}, _from, game) do
     game1 = Game.modifyUser(game, userId, player)
     if game1 do
       BackupAgent.put(name, game1)
     end
+    {:reply, game, game}
+  end
+
+  # toggle the ready state of a player
+  def handle_call({:setReady, name, userId, ready}, _from, game) do
+    game = Game.setReady(game, userId, ready)
+    BackupAgent.put(name, game)
     {:reply, game, game}
   end
 
