@@ -14,6 +14,7 @@ SOCKET MESSAGES:
     -> "tooManyUsers" response if it would cause more than 4 players
 "readyUp", {ready: boolean} -> call to toggle if a player is ready (toggle only visible if user is a player?)
 "guess", [guessArr] ->  called when a user guesses
+                    -> does not return a state update!
 
 
 
