@@ -28,6 +28,8 @@ defmodule Bulls.GameServer do
       game,
       name: reg(name)
     )
+    # not sure if this is necessary, seems necessary
+    BackupAgent.put(name, game)
   end
 
   def reset(name) do
@@ -40,6 +42,21 @@ defmodule Bulls.GameServer do
 
   def peek(name) do
     GenServer.call(reg(name), {:peek, name})
+  end
+
+  # add a new player to the game
+  # name: string: game name
+  # user: string: user name
+  def addObserver(name, user) do
+    GenServer.call(reg(name), {:addObserver, name, user})
+  end
+
+  # toggle a user between player and observer
+  # name: string: game name
+  # userId: int: id of the user
+  # player: boolean: true if wants to become a player, false if become observer 
+  def modifyUser(name, userId, player) do
+    GenServer.call(reg(name), {:modifyUser, name, userId, player})
   end
 
   # implementation
@@ -63,6 +80,23 @@ defmodule Bulls.GameServer do
   end
 
   def handle_call({:peek, _name}, _from, game) do
+    {:reply, game, game}
+  end
+
+  # add an observer
+  def handle_call({:addObserver, name, user}, _from, game) do
+    # add an observer and return th id!
+    game1 = Game.addObserver(game, user)
+    BackupAgent.put(name, game1)
+    {:reply, game, game}
+  end
+
+  # toggle user from player to observer or vice versa
+  def handle_call({:modifyUser, name, userId, player}), _from, game) do
+    game1 = Game.modifyUser(game, userId, player)
+    if game1 do
+      BackupAgent.put(name, game1)
+    end
     {:reply, game, game}
   end
 

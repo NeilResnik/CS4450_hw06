@@ -13,37 +13,80 @@ defmodule Bulls.Game do
 
     # I think that game state should store players
     # each player has a game history
-    # 
     def new(name) do
-        %{
-            guessHistory: [],
-            gameState: "playing",
-            answer: randomAnswer([]),
-            gameName: name,
-            players: []
-        }
-
-        # OR
-
         # gameState one of readyUp, playing
-        % {
-            players: [{
-                guess:,
-                bulls:,
-                cows:,
-            }],
-            observers([])
-            gameState: "waiting"
-            answer: randomAnswer([])
+        %{
+            players: %{},
+            observers: %{},
+            gameState: "waiting",
+            answer: randomAnswer([]),
             gameName: name
         }
     end
 
     # return a user safe state
-    def view(st) do
+    # TODO modify view to have user: players:
+    def view(userId, st) do
         Map.delete(st, :answer)
     end
 
+    # TODO modify a user!
+    # st: state
+    # userId: int
+    # player: bool: true if become player, false if become observer
+    # -> return nil if too many players
+    def modifyUser(st, userId, player) do
+        if countPlayers(st) >= 4 do
+            nil
+        end
+        
+        if player do
+            # turn an observer into a player
+            name = st.observers[userId]
+            if name do
+                st = %{st | observers: Map.delete(st.observers, userId)}
+                %{st | players: Map.put(st.players, userId, %{
+                    user: name,
+                    ready: false,
+                    guesses: []
+                })}
+            else
+                raise "trying to convert unkown id into player"
+            end
+        else
+            # turn a player into an observer
+            getPlayer = st.players[userId]
+            if getPlayer do
+                name = getPlayer.user
+                st = %{st | players: Map.delete(st.players, userId)}
+                %{st | observers: Map.put(st.observers, userId, name)}
+            else
+                raise "trying to convert unkown id into observer"
+            end
+        end
+
+    end
+
+    # count the number of players
+    def countPlayers(st) do
+        Enum.count(st.players)
+    end
+
+    # add a new player as an observer!
+    # st: state
+    # user: string: user name
+    def addObserver(st, user) do
+        id = totalMemberCount(st) + 1
+        %{st | observers: Map.put(st.observers, id, user)}
+    end
+
+    # get number of players so far
+    # state -> int
+    def totalMemberCount(st) do
+        Enum.count(st.players) + Enum.count(st.observers)
+    end
+
+    # TODO: modify this to take (st, arr, user)
     # input : old state
     # output : new state
     # validate guess, determine bulls and cows
@@ -66,6 +109,7 @@ defmodule Bulls.Game do
         end
     end
 
+    # TODO: modify this to change "playing" -> "waiting" when someone wins
     # get the current game state after a guess
     def getState(history) do
         if hd(history).bulls == "4" do
