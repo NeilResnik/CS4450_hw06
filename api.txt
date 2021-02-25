@@ -78,7 +78,7 @@ STORE PLAYERS BY ID
 
 
 {
-    players: [{
+    players: {
         id: {
                 'user': string,
                 'ready': bool,
@@ -88,8 +88,7 @@ STORE PLAYERS BY ID
                     cows: number
                 }]
             }
-        ],
-    }]
+    }
     observers: [{id: int, user: string}]
     gameState: "waiting" || "playing"
     answer: ["#", "#", "#", "#"]
