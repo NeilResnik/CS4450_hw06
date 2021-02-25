@@ -27,19 +27,8 @@ Game:
         List of Strings (each string = 1 letter)
 
     view:
-    {
-        Users: List of Strings,
-        Observers: List of Strings,
-        Guesses: List of (Maps of 
-            {
-                User: string,
-                Guess: string,
-                Bulls: number,
-                Cows: number
-            }), each map = round, front/lower index = more recent
-    }
 
-    view2 {
+    {
         user: userId
         players:
         {
