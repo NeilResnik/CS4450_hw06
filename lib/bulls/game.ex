@@ -43,10 +43,16 @@ defmodule Bulls.Game do
     # userId: int 
     # ready: bool
     def setReady(st, userId, ready) do
-        if Map.has_key?(st.players, userId) do
-            st = %{st | players: %{st.players | (userId) => %{st.players[userId] | ready: ready}}}
-            if allReady?(st) do
-                %{st | gameState: "playing"}
+        # if game state is not waiting people can ready up!
+        if st.gameState == "waiting" do
+            # make sure the id exists in players (not an observer)
+            if Map.has_key?(st.players, userId) do
+                st = %{st | players: %{st.players | (userId) => %{st.players[userId] | ready: ready}}}
+                if allReady?(st) do
+                    %{st | gameState: "playing"}
+                else
+                    st
+                end
             else
                 st
             end

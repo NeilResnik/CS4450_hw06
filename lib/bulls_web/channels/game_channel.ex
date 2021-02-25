@@ -72,11 +72,11 @@ defmodule BullsWeb.GameChannel do
     # get the user id and game name
     name = socket.assigns[:game]
     userId = socket.assigns[:user]
-
+    # set ready!
     game = GameServer.setReady(name, userId, payload.ready)
-
+    # get the viewww
     view = Game.view(game)
-
+    # broadcast view!
     broadcast(socket, "view", view)
     {:reply, {:ok, view}, socket}
   end
