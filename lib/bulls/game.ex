@@ -44,7 +44,12 @@ defmodule Bulls.Game do
     # ready: bool
     def setReady(st, userId, ready) do
         if Map.has_key?(st.players, userId) do
-            %{st | players: %{st.players | (userId) => %{st.players[userId] | ready: ready}}}
+            st = %{st | players: %{st.players | (userId) => %{st.players[userId] | ready: ready}}}
+            if allReady?(st) do
+                %{st | gameState: "playing"}
+            else
+                st
+            end
         else
             st
         end
@@ -56,8 +61,14 @@ defmodule Bulls.Game do
     # player: bool: true if become player, false if become observer
     # -> return nil if too many players
     def modifyUser(st, userId, player) do
+        # return nil if there are already 4 players
         if countPlayers(st) >= 4 do
             nil
+        end
+
+        # do nothing if game is in  progress
+        if st.gameState == "playing" do
+            st
         end
         
         if player do
