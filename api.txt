@@ -83,6 +83,6 @@ STORE PLAYERS BY ID
     answer: ["#", "#", "#", "#"]
     pendingGuesses: {id: { guess: string, bulls: number, cows: number } }
     prevWinners: [ list of winners ]
-    leaderboard: {id: {username: name, wins: int, losses: int}}
+    leaderboard: {id: {user: name, wins: int, losses: int}}
     gameName: name
 }
