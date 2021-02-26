@@ -2,7 +2,7 @@
 defmodule Bulls.GameServer do
   use GenServer
 
-  alias Bulls.BackupAgent
+  #alias Bulls.BackupAgent
   alias Bulls.Game
   alias Bulls.GameSup
 
@@ -22,14 +22,15 @@ defmodule Bulls.GameServer do
   end
 
   def start_link(name) do
-    game = BackupAgent.get(name) || Game.new(name)
+    #game = BackupAgent.get(name) || Game.new(name)
+    game = Game.new(name)
     GenServer.start_link(
       __MODULE__,
       game,
       name: reg(name)
     )
     # not sure if this is necessary, seems necessary
-    BackupAgent.put(name, game)
+    #BackupAgent.put(name, game)
   end
   
   #def reset(name) do
@@ -73,13 +74,13 @@ defmodule Bulls.GameServer do
 
   def handle_call({:reset, name}, _from, game) do
     game = Game.new(game[:gameName])
-    BackupAgent.put(name, game)
+    #BackupAgent.put(name, game)
     {:reply, game, game}
   end
 
   def handle_call({:guess, name, userId, guessArr}, _from, game) do
     game = Game.addGuess(game, userId, guessArr)
-    BackupAgent.put(name, game)
+    #BackupAgent.put(name, game)
     {:reply, game, game}
   end
 
@@ -91,7 +92,7 @@ defmodule Bulls.GameServer do
   def handle_call({:addObserver, name, user}, _from, game) do
     # add an observer and return th id!
     game1 = Game.addObserver(game, user)
-    BackupAgent.put(name, game1)
+    #BackupAgent.put(name, game1)
     {:reply, game, game}
   end
 
@@ -99,7 +100,7 @@ defmodule Bulls.GameServer do
   def handle_call({:modifyUser, name, userId, player}, _from, game) do
     game = Game.modifyUser(game, userId, player)
     if game do
-      BackupAgent.put(name, game)
+      #BackupAgent.put(name, game)
     end
     {:reply, game, game}
   end
@@ -107,11 +108,11 @@ defmodule Bulls.GameServer do
   # toggle the ready state of a player, if all ready then start timer!
   def handle_call({:setReady, name, userId, ready}, _from, game) do
     game = Game.setReady(game, userId, ready)
+    #BackupAgent.put(name, game)
     if game.gameState == "playing" do
       Process.send_after(self(), :doGuesses, 30_000)
       {:ok, name}
     end
-    BackupAgent.put(name, game)
     {:reply, game, game}
   end
 
@@ -119,6 +120,7 @@ defmodule Bulls.GameServer do
   def handle_info(:doGuesses, name) do
     game = reg(name)
     game = Game.doGuesses(game)
+    #BackupAgent.put(name, game)
     BullsWeb.Endpoint.broadcast!(
       "game:#{name}",
       "view",
