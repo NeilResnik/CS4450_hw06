@@ -34,9 +34,9 @@ Game:
         players:
         {
             id: {
-                    'user': string,
-                    'ready': bool,
-                    'guesses': [{
+                    user: string,
+                    ready: bool,
+                    guesses: [{
                         guess: string,
                         bulls: number,
                         cows: number
