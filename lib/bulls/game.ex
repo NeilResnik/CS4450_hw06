@@ -88,33 +88,33 @@ defmodule Bulls.Game do
         # do nothing if game is in  progress
         if st.gameState == "playing" do
             st
-        end
-        
-        if player do
-            # turn an observer into a player
-            name = st.observers[userId]
-            if name do
-                st = %{st | observers: Map.delete(st.observers, userId)}
-                %{st | players: Map.put(st.players, userId, %{
-                    user: name,
-                    ready: false,
-                    guesses: []
-                })}
-            else
-                raise "trying to convert unkown id into player"
-            end
         else
-            # turn a player into an observer
-            getPlayer = st.players[userId]
-            if getPlayer do
-                name = getPlayer.user
-                st = %{st | players: Map.delete(st.players, userId)}
-                %{st | observers: Map.put(st.observers, userId, name)}
+        
+            if player do
+                # turn an observer into a player
+                name = st.observers[userId]
+                if name do
+                    st = %{st | observers: Map.delete(st.observers, userId)}
+                    %{st | players: Map.put(st.players, userId, %{
+                        user: name,
+                        ready: false,
+                        guesses: []
+                    })}
+                else
+                    raise "trying to convert unkown id into player"
+                end
             else
-                raise "trying to convert unkown id into observer"
+                # turn a player into an observer
+                getPlayer = st.players[userId]
+                if getPlayer do
+                    name = getPlayer.user
+                    st = %{st | players: Map.delete(st.players, userId)}
+                    %{st | observers: Map.put(st.observers, userId, name)}
+                else
+                    raise "trying to convert unkown id into observer"
+                end
             end
         end
-
     end
 
     # count the number of players
@@ -154,10 +154,18 @@ defmodule Bulls.Game do
             st = %{st | prevWinners: getWinnersName(st)}
             st = %{st | leaderboard: updateLeaderBoard(st.leaderboard, winners)}
             # set state to waiting
-            %{st | gameState: "waiting"}
+            st = %{st | gameState: "waiting"}
+            %{st | players: setReadyFalse(st.players)}
         else
             st
         end
+    end
+
+    # set all players false
+    def setReadyFalse(players) do
+        Enum.reduce(players, %{}, fn({key, val}, acc) ->
+            Map.put(acc, key, %{val | ready: false})
+        end)
     end
 
     # return list of winner id's or nil
@@ -195,7 +203,7 @@ defmodule Bulls.Game do
             if Enum.member?(winners, key) do
                 Map.put(acc, key, %{val | wins: val.wins + 1})
             else
-                Map.put(acc, key, %{val | wins: val.losses + 1})
+                Map.put(acc, key, %{val | losses: val.losses + 1})
             end
         end)
     end
