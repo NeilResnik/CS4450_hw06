@@ -44,7 +44,8 @@ Game:
                 }
         },
         observers: { id: username }
-
+        prevWinners: [ usernames as strings ]
+        leaderboard: {id: {username: name, wins: int, losses: int}}
         gameState: "waiting" || "playing"
         gameName: name
     }
@@ -81,5 +82,6 @@ STORE PLAYERS BY ID
     gameState: "waiting" || "playing"
     answer: ["#", "#", "#", "#"]
     pendingGuesses: {id: { guess: string, bulls: number, cows: number } }
+    
     gameName: name
 }
