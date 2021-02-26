@@ -48,6 +48,7 @@ defmodule Bulls.Game do
             # make sure the id exists in players (not an observer)
             if Map.has_key?(st.players, userId) do
                 st = %{st | players: %{st.players | (userId) => %{st.players[userId] | ready: ready}}}
+                # check if all players are now ready
                 if allReady?(st) do
                     %{st | gameState: "playing"}
                 else
