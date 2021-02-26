@@ -2,23 +2,17 @@ defmodule Bulls.GameSup do
   use DynamicSupervisor
 
   def start_link(arg) do
-    DynamicSupervisor.start_link(
-      __MODULE__,
-      arg,
-      name: __MODULE__
-    )
+    DynamicSupervisor.start_link(__MODULE__, arg, name: __MODULE__)
   end
 
   @impl true
   def init(_arg) do
-    {:ok, _} = Registry.start_link(
-      keys: :unique,
-      name: Bulls.GameReg,
-    )
+    {:ok, _} = Registry.start_link(keys: :unique, name: Bulls.GameReg)
     DynamicSupervisor.init(strategy: :one_for_one)
   end
 
   def start_child(spec) do
+    IO.puts('yo')
     DynamicSupervisor.start_child(__MODULE__, spec)
   end
 
