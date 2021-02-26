@@ -82,6 +82,7 @@ STORE PLAYERS BY ID
     gameState: "waiting" || "playing"
     answer: ["#", "#", "#", "#"]
     pendingGuesses: {id: { guess: string, bulls: number, cows: number } }
-    
+    prevWinners: [ list of winners ]
+    leaderboard: {id: {username: name, wins: int, losses: int}}
     gameName: name
 }
