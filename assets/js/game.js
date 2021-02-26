@@ -1,7 +1,7 @@
 import 'bulma/css/bulma.css'
 import '../css/app.scss'
-import React, { useState } from 'react';
-import { ch_push, ch_reset } from './socket';
+import React, { useEffect, useState } from 'react';
+import { ch_join, ch_push, ch_reset } from './socket';
 
 function guess(text){
     if(text.length < 4) {
@@ -10,7 +10,7 @@ function guess(text){
     ch_push("guess", text.split(""));
 }
 
-export function GameSelect({stateSetter}) {
+export function GameSelect({stateSetters}) {
     const [gameName, setGameName] = useState("");
     const [userName, setUserName] = useState("");
 
@@ -20,7 +20,7 @@ export function GameSelect({stateSetter}) {
 
     function onKeypress(event) {
         if(event.key === "Enter" && validate()){
-            ch_join(gameName, userName, stateSetter);
+            ch_join(gameName, userName, stateSetters);
         }
     }
 
@@ -44,7 +44,7 @@ export function GameSelect({stateSetter}) {
             </div>
             <div className="control">
                 <button className="button is-primary"
-                        onClick={() => { if(validate()) { ch_join(gameName, userName, stateSetter);  }}}>
+                        onClick={() => { if(validate()) { ch_join(gameName, userName, stateSetters);  }}}>
                     Join Game 
                 </button>
             </div>
@@ -53,25 +53,28 @@ export function GameSelect({stateSetter}) {
 }
 
 export function WaitingRoom({players, user}) {
-    const [status, setStatue] = useState(false);
+    let player_states = [];
+    for(const [id, p] of Object.entries(players)) {
+        player_states.push((
+            <li key={p + i}>
+                <p>{p.user}</p>
+                    <label className="checkbox">
+                        <input 
+                            type="checkbox"
+                            id={p + i + "checkbox"}
+                            checked={p.ready}
+                            onChange={ch_push("readyUp",
+                                              {ready: document.getElementById(p + i + "checkbox").checked})}
+                            disabled={id === user}/>
+                        Ready
+                    </label>
+            </li>
+        ));
+    }
     return (
         <div>
             <ul className="no-marker">
-                {players.map(function(p, i){
-                    <li key={p + i}>
-                        <p>p.name</p>
-                            <label className="checkbox">
-                                <input 
-                                    type="checkbox"
-                                    id={p + i + "checkbox"}
-                                    checked={p.ready}
-                                    onChange={ch_push("readyUp",
-                                                      {ready: document.getElementById(p + i + "checkbox").checked})}
-                                    disabled={p.name === user}/>
-                                Ready
-                            </label>
-                    </li>
-                })}
+                {player_states}
             </ul>
         </div>
     );
@@ -115,12 +118,6 @@ export function GuessInput({enabled}) {
                     Guess 
                 </button>
             </div>
-            <div className="control">
-                <button className="button is-danger"
-                    onClick={() => ch_reset({})}>
-                    Reset
-                </button>
-            </div>
         </div>
     );
 }
@@ -145,7 +142,8 @@ export function ResultList({players}) {
     if(players.length < 1) return (<div className="content"></div>);
     let rounds = [];
     let first = true;
-    for(const p of players) {
+    for(const pobj of players) {
+        let p = pobj.values()[0];
         let i = 0;
         for(const r of p.results) {
             let result_string = p.name + ": " + r.bulls + "A" + r.cows + "B";
@@ -182,8 +180,10 @@ export function ResultList({players}) {
 }
 
 export function get_winners(players) {
+    console.log(players);
     let winners = [];
-    for(const p of players) {
+    for(const pobj of players) {
+        let p = pobj.values()[0];
         if (p.results.length > 0 && p.results[0].bulls === 4) {
             winners.append(p.name)
         }
@@ -203,6 +203,30 @@ export function WinnerList({winners}) {
                     );
                 })}
             </ul>
+        </div>
+    );
+}
+
+export function Timer({timeout}) {
+    function getTimeLeft() {
+        return (timeout - Date.now()) / 1000;
+    }
+
+    const [timeLeft, setTimeLeft] = useState(get_time_left);
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            let tl = getTimeLeft();
+            if(tl >= 0) {
+                setTimeLeft(tl);
+            } else {
+                setTimeLeft(0);
+            }
+        }, 1000);
+        return () => clearTimeout(timer);
+    });
+    return (
+        <div>
+            <p>{timeLeft}</p>
         </div>
     );
 }

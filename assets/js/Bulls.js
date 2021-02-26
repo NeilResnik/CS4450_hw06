@@ -1,25 +1,24 @@
 import 'bulma/css/bulma.css'
 import '../css/app.scss'
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import * as game from './game'
-import { ch_join } from './socket'
 
 function Bulls() {
-    const [gameState, setGameState] = useState(null);
+    const [gameState, setGameState] = useState({});
+    const [timeOut, setTimeOut] = useState(0);
 
-    let winners = game.get_winners(gameState.players);
 
     let body = null;
-    if (!gameState) {
+    if (Object.entries(gameState).length === 0) {
         body = (
             <div>
-                <game.GameSelect stateSetter={setGameState}/>
+                <game.GameSelect stateSetters={[setGameState, (_) => { setTimeOut(Date.now() + 30000); }]}/>
             </div>
         );
-    } else if (gameState.gameState == "waiting") {
+    } else if (gameState.gameState === "waiting") {
         body = (
             <div>
-                <game.WaitingRoom players={gameState.players} user={} />
+                <game.WaitingRoom players={gameState.players} user={gameState.userId} />
             </div>
         );
     } else {
@@ -27,13 +26,14 @@ function Bulls() {
             <div>
                <section className="section">
                    <div className="container has-text-centered">
-                        <game.GuessInput enabled={winners.length === 0}/>
+                       <game.Timer timeout={timeOut}/>
+                        <game.GuessInput enabled={get_winners(gameState.players).length === 0}/>
                    </div>
                </section>
                <section className="section">
                    <div className="container has-text-centered">
                        <h1 className="title is-size-2">Guesses:</h1>
-                       <GuessList />
+                       <game.ResultList players={gameState.players} />
                    </div>
                </section>
            </div>
@@ -43,7 +43,7 @@ function Bulls() {
 
     return (
         <div className="Bulls">
-            body
+            {body}
         </div>
     );
 }

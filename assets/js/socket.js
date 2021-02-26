@@ -57,7 +57,7 @@ socket.connect()
 // Based on Nat Tuck's code at
 //https://github.com/NatTuck/scratch-2021-01/blob/master/4550/0216/hangman/assets/js/socket.js
 let channel = null;
-let callback = null;
+let callbacks = [];
 
 function convert_state(st) {
     let guesses = [];
@@ -78,19 +78,22 @@ function convert_state(st) {
 
 function state_update(state) {
     console.log(state)
-    if(callback) {
-      callback(state);
+    for(const cb of callbacks) {
+        cb(state);
     }
 }
 
-export function ch_join(gameName, user, cb){
-    channel = socket.channel(gameName, {name: user})
-    callback = cb;
+export function ch_join(gameName, userName, cbs) {
+    channel = socket.channel("game:" + gameName, {user: userName})
+    callbacks = callbacks.concat(cbs);
+    channel.join()
+           .receive("ok", state_update)
+           .receive("error", resp => { console.log("Unable to join:", resp) })
 }
 
 export function ch_push(guess){
     channel.push("guess", guess)
-           .receive("ok", state_update)
+           .receive("view", state_update)
            .receive("error", (resp) => {
              console.log("Unable to push:", resp)
            });
@@ -98,13 +101,12 @@ export function ch_push(guess){
 
 export function ch_reset(){
     channel.push("reset", {})
-           .receive("ok", state_update)
+           .receive("view", state_update)
            .receive("error", (resp) => {
              console.log("Unable to reset:", resp)
            });
 }
 
-channel.join()
-       .receive("ok", state_update)
-       .receive("error", resp => { console.log("Unable to join:", resp) })
-
+if(channel) {
+    channel.on("view", state_update);
+}
