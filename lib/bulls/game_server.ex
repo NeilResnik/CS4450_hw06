@@ -89,6 +89,10 @@ defmodule Bulls.GameServer do
     id = Game.totalMemberCount(game) + 1
     game = Game.addObserver(game, user, id)
     #BackupAgent.put(name, game)
+    BullsWeb.Endpoint.broadcast!(
+      "game:#{game.gameName}",
+      "view",
+      Game.view(game))
     {:reply, id, game}
   end
 
