@@ -15,7 +15,7 @@ SOCKET MESSAGES:
 "readyUp", {ready: boolean} -> call to toggle if a player is ready (toggle only visible if user is a player?)
 "guess", [guessArr] ->  called when a user guesses
                     -> does not return a state update!
-                    -> returns "ok" or "invalidGuess" (either incorrect length/chars or guessed during "waiting" state
+                    -> returns "ok" or "invalidGuess" (either incorrect length/chars or guessed during "waiting" state or user has already guessed this round)
 
 
 
