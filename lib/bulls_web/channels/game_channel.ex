@@ -30,16 +30,21 @@ defmodule BullsWeb.GameChannel do
   # Channels can be used in a request/response fashion
   # by sending replies to requests from the client
   @impl true
-  def handle_in("guess", guessArr, socket0) do
+  def handle_in("guess", guessArr, socket) do
     # take the user from the socket, have that user guess the guessArr
 
-    # TODO
-    game0 = socket0.assigns[:game]
-    game1 = Game.guess(game0, guessArr)
-    socket1 = assign(socket0, :game, game1)
-    view = Game.view(game1)
-    # decide what to send back to the user (do not reveal guesses)
-    {:ok, view, socket}
+    name = socket.assigns[:game]
+    userId = socket.assigns[:user]
+
+    # get the current game state
+    game = GameServer.addGuess(name, userId, guessArr)
+
+    if game do
+      # just say okay we got it!
+      {:ok, socket}
+    else
+      {:invalidGuess, socket}
+    end
   end
 
   # It is also common to receive messages from the client and

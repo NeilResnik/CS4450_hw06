@@ -31,13 +31,13 @@ defmodule Bulls.GameServer do
     # not sure if this is necessary, seems necessary
     BackupAgent.put(name, game)
   end
+  
+  #def reset(name) do
+    #GenServer.call(reg(name), {:reset, name})
+  #end
 
-  def reset(name) do
-    GenServer.call(reg(name), {:reset, name})
-  end
-
-  def guess(name, guessList) do
-    GenServer.call(reg(name), {:guess, name, guessList})
+  def guess(name, userId, guessArr) do
+    GenServer.call(reg(name), {:guess, name, userId, guessArr})
   end
 
   def peek(name) do
@@ -70,11 +70,6 @@ defmodule Bulls.GameServer do
 
   # implementation
 
-  # modify this to do theeeeeee auto guess and show guesses states
-  def init(game) do
-    Process.send_after(self(), :pass, 30_000)
-    {:ok, game}
-  end
 
   def handle_call({:reset, name}, _from, game) do
     game = Game.new(game[:gameName])
@@ -82,8 +77,8 @@ defmodule Bulls.GameServer do
     {:reply, game, game}
   end
 
-  def handle_call({:guess, name, letter}, _from, game) do
-    game = Game.guess(game, letter)
+  def handle_call({:guess, name, userId, guessArr}, _from, game) do
+    game = Game.addGuess(game, userId, guessArr)
     BackupAgent.put(name, game)
     {:reply, game, game}
   end
@@ -102,27 +97,37 @@ defmodule Bulls.GameServer do
 
   # toggle user from player to observer or vice versa
   def handle_call({:modifyUser, name, userId, player}, _from, game) do
-    game1 = Game.modifyUser(game, userId, player)
-    if game1 do
-      BackupAgent.put(name, game1)
+    game = Game.modifyUser(game, userId, player)
+    if game do
+      BackupAgent.put(name, game)
     end
     {:reply, game, game}
   end
 
-  # toggle the ready state of a player
+  # toggle the ready state of a player, if all ready then start timer!
   def handle_call({:setReady, name, userId, ready}, _from, game) do
     game = Game.setReady(game, userId, ready)
+    if game.gameState == "playing" do
+      Process.send_after(self(), :doGuesses, 30_000)
+      {:ok, name}
+    end
     BackupAgent.put(name, game)
     {:reply, game, game}
   end
 
   # TODO modify this to pass a guess
-  def handle_info(:pass, game) do
-    game = Game.guess(game, "q")
-    HangmanWeb.Endpoint.broadcast!(
-      "game:1", # FIXME: Game name should be in state
+  def handle_info(:doGuesses, name) do
+    game = reg(name)
+    game = Game.doGuesses(game)
+    BullsWeb.Endpoint.broadcast!(
+      "game:#{name}",
       "view",
-      Game.view(game, ""))
+      Game.view(game))
+    if game.gameState == "playing" do
+      # nobody has won, start next timer
+      Process.send_after(self(), :doGuesses, 30_000)
+      {:ok, name}
+    end
     {:noreply, game}
   end
 end
