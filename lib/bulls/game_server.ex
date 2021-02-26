@@ -86,9 +86,10 @@ defmodule Bulls.GameServer do
   # add an observer
   def handle_call({:addObserver, _name, user}, _from, game) do
     # add an observer and return th id!
-    game = Game.addObserver(game, user)
+    id = Game.totalMemberCount(game) + 1
+    game = Game.addObserver(game, user, id)
     #BackupAgent.put(name, game)
-    {:reply, game, game}
+    {:reply, id, game}
   end
 
   # toggle user from player to observer or vice versa
@@ -106,24 +107,23 @@ defmodule Bulls.GameServer do
     #BackupAgent.put(name, game)
     if game.gameState == "playing" do
       Process.send_after(self(), :doGuesses, 30_000)
-      {:ok, name}
+      {:ok, game}
     end
     {:reply, game, game}
   end
 
   # TODO modify this to pass a guess
-  def handle_info(:doGuesses, name) do
-    game = reg(name)
+  def handle_info(:doGuesses, game) do
     game = Game.doGuesses(game)
     #BackupAgent.put(name, game)
     BullsWeb.Endpoint.broadcast!(
-      "game:#{name}",
+      "game:#{game.gameName}",
       "view",
       Game.view(game))
     if game.gameState == "playing" do
       # nobody has won, start next timer
       Process.send_after(self(), :doGuesses, 30_000)
-      {:ok, name}
+      {:ok, game}
     end
     {:noreply, game}
   end
