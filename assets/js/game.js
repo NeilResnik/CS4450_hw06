@@ -52,24 +52,64 @@ export function GameSelect({stateSetters}) {
     );
 }
 
-export function WaitingRoom({players, user}) {
+export function WaitingRoom({players, observers, user}) {
+    function get_radio(p, id, observer) {
+        return (
+            <li key={p + id}>
+                <p>{p.user}</p>
+                    <div className="control">
+                        <label className="radio">
+                            <input 
+                                type="radio"
+                                id={p + id + "ready"}
+                                checked={!observer && p.ready}
+                                onChange={() => {
+                                    if(document.getElementById(p + i + "ready").checked) {
+                                        ch_push("modifyUser", {player: true});
+                                        ch_push("readyUp", {ready: true});
+                                    }
+                                }}
+                                disabled={id === user}/>
+                            Ready
+                        </label>
+                        <label className="radio">
+                            <input 
+                                type="radio"
+                                id={p + id + "notready"}
+                                checked={!observer && p.ready}
+                                onChange={() => {
+                                    if(document.getElementById(p + i + "ready").checked) {
+                                        ch_push("modifyUser", {player: true});
+                                        ch_push("readyUp", {ready: false});
+                                    }
+                                }}
+                                disabled={id === user}/>
+                            Not Ready
+                        </label>
+                        <label className="radio">
+                            <input 
+                                type="radio"
+                                id={p + id + "observe"}
+                                checked={observer}
+                                onChange={() => {
+                                    if(document.getElementById(p + i + "ready").checked) {
+                                        ch_push("modifyUser", {player: false});
+                                    }
+                                }}
+                                disabled={id === user}/>
+                            Observe
+                        </label>
+                    </div>
+            </li>
+        );
+    }
+
     let player_states = [];
     for(const [id, p] of Object.entries(players)) {
-        player_states.push((
-            <li key={p + i}>
-                <p>{p.user}</p>
-                    <label className="checkbox">
-                        <input 
-                            type="checkbox"
-                            id={p + i + "checkbox"}
-                            checked={p.ready}
-                            onChange={ch_push("readyUp",
-                                              {ready: document.getElementById(p + i + "checkbox").checked})}
-                            disabled={id === user}/>
-                        Ready
-                    </label>
-            </li>
-        ));
+        player_states.push(get_radio(p, id, false));
+    }
+    for(const [id, o] of Object.entries(observers)) {
+        player_states.push(get_radio(p, id, true));
     }
     return (
         <div>
