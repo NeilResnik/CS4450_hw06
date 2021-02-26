@@ -4,10 +4,9 @@ defmodule Bulls.GameServer do
 
   #alias Bulls.BackupAgent
   alias Bulls.Game
-  alias Bulls.GameSup
 
   # public interface
-  def register(name) do
+  def reg(name) do
     {:via, Registry, {Bulls.GameReg, name}}
   end
 
@@ -18,7 +17,7 @@ defmodule Bulls.GameServer do
       restart: :permanent,
       type: :worker
     }
-    GameSup.start_child(spec)
+    Bulls.GameSup.start_child(spec)
   end
 
   def start_link(name) do
@@ -32,10 +31,6 @@ defmodule Bulls.GameServer do
     # not sure if this is necessary, seems necessary
     #BackupAgent.put(name, game)
   end
-  
-  #def reset(name) do
-    #GenServer.call(reg(name), {:reset, name})
-  #end
 
   def guess(name, userId, guessArr) do
     GenServer.call(reg(name), {:guess, name, userId, guessArr})
@@ -72,13 +67,13 @@ defmodule Bulls.GameServer do
   # implementation
 
 
-  def handle_call({:reset, name}, _from, game) do
+  def handle_call({:reset, _name}, _from, game) do
     game = Game.new(game[:gameName])
     #BackupAgent.put(name, game)
     {:reply, game, game}
   end
 
-  def handle_call({:guess, name, userId, guessArr}, _from, game) do
+  def handle_call({:guess, _name, userId, guessArr}, _from, game) do
     game = Game.addGuess(game, userId, guessArr)
     #BackupAgent.put(name, game)
     {:reply, game, game}
@@ -89,15 +84,15 @@ defmodule Bulls.GameServer do
   end
 
   # add an observer
-  def handle_call({:addObserver, name, user}, _from, game) do
+  def handle_call({:addObserver, _name, user}, _from, game) do
     # add an observer and return th id!
-    game1 = Game.addObserver(game, user)
-    #BackupAgent.put(name, game1)
+    game = Game.addObserver(game, user)
+    #BackupAgent.put(name, game)
     {:reply, game, game}
   end
 
   # toggle user from player to observer or vice versa
-  def handle_call({:modifyUser, name, userId, player}, _from, game) do
+  def handle_call({:modifyUser, _name, userId, player}, _from, game) do
     game = Game.modifyUser(game, userId, player)
     if game do
       #BackupAgent.put(name, game)

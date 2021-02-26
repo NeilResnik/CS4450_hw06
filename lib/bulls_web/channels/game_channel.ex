@@ -37,7 +37,7 @@ defmodule BullsWeb.GameChannel do
     userId = socket.assigns[:user]
 
     # get the current game state
-    game = GameServer.addGuess(name, userId, guessArr)
+    game = GameServer.guess(name, userId, guessArr)
 
     if game do
       # just say okay we got it!
