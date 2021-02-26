@@ -8,7 +8,7 @@ defmodule BullsWeb.GameChannel do
   def join("game:" <> name, payload, socket) do
 
     if authorized?(payload) do
-      # either get the backup or start new game
+      # either error or start new game
       GameServer.start(name)
       # get the user id and add the user as an observer (to start)
       userId = GameServer.addObserver(name, payload["user"])
@@ -20,7 +20,6 @@ defmodule BullsWeb.GameChannel do
       game = GameServer.peek(name)
       # get a reduced state (no answer)
       view = Game.view(game)
-      #broadcast(socket, "view", view)
       {:ok, view, socket}
     else
       {:error, %{reason: "unauthorized"}}

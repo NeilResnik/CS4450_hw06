@@ -12,7 +12,6 @@ defmodule Bulls.GameSup do
   end
 
   def start_child(spec) do
-    IO.puts('yo')
     DynamicSupervisor.start_child(__MODULE__, spec)
   end
 

@@ -125,8 +125,7 @@ defmodule Bulls.Game do
     # add a new player as an observer!
     # st: state
     # user: string: user name
-    def addObserver(st, user) do
-        id = totalMemberCount(st) + 1
+    def addObserver(st, user, id) do
         st = %{st | observers: Map.put(st.observers, id, user)}
         %{st | leaderboard: Map.put(st.leaderboard, id, %{user: user, wins: 0, losses: 0})}
     end
@@ -172,8 +171,12 @@ defmodule Bulls.Game do
     def getWinnersId(st) do
         # get a list of userIds that won
         winners = Enum.reduce(st.players, [], fn({key, val}, acc) ->
-            if hd(val.guesses).bulls == 4 do
-                [key | acc]
+            if Enum.count(val.guesses) > 0 do
+                if hd(val.guesses).bulls == 4 do
+                    [key | acc]
+                else
+                    acc
+                end
             else
                 acc
             end
