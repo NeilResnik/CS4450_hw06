@@ -10,13 +10,9 @@ function Bulls() {
 
     useEffect(() => {
         set_callback((st) => {
-            console.log("callback");
-            // console.log("setTimeOut");
             setTimeOut(Date.now() + 30000);
-            // console.log("setGameState");
             console.log(st);
             setGameState(st);
-            console.log("callback over");
         });
     }, []);
 
@@ -31,7 +27,7 @@ function Bulls() {
         body = (
             <div>
                 <h1> {gameState.gameName} </h1>
-                <WaitingRoom players={gameState.players} observers={gameState.observers} user={gameState.userId} />
+                <WaitingRoom players={gameState.players} observers={gameState.observers} user={gameState.user} />
             </div>
         );
     } else if (gameState.gameState === "playing"){

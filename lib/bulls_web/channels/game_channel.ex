@@ -20,6 +20,7 @@ defmodule BullsWeb.GameChannel do
       game = GameServer.peek(name)
       # get a reduced state (no answer)
       view = Game.view(game)
+      view = Map.put(view, :user, userId)
       {:ok, view, socket}
     else
       {:error, %{reason: "unauthorized"}}

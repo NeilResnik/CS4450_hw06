@@ -52,7 +52,7 @@ export function GameSelect() {
     );
 }
 
-export function WaitingRoom({players, observers, user}) {
+export function WaitingRoom({players, observers, userId}) {
     function get_radio(pname, id, observer, ready) {
         return (
             <li key={pname + id}>
@@ -69,7 +69,7 @@ export function WaitingRoom({players, observers, user}) {
                                         ch_push("readyUp", {ready: true});
                                     }
                                 }}
-                                disabled={id === user}/>
+                                disabled={id !== userId}/>
                             Ready
                         </label>
                         <label className="radio">
@@ -83,7 +83,7 @@ export function WaitingRoom({players, observers, user}) {
                                         ch_push("readyUp", {ready: false});
                                     }
                                 }}
-                                disabled={id === user}/>
+                                disabled={id !== userId}/>
                             Not Ready
                         </label>
                         <label className="radio">
@@ -96,7 +96,7 @@ export function WaitingRoom({players, observers, user}) {
                                         ch_push("modifyUser", {player: false});
                                     }
                                 }}
-                                disabled={id === user}/>
+                                disabled={id !== userId}/>
                             Observe
                         </label>
                     </div>
