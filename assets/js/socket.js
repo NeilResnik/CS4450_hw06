@@ -89,6 +89,7 @@ export function set_callback(cb) {
 export function ch_join(gameName, userName) {
     channel = socket.channel("game:" + gameName, {user: userName})
     channel.on("view", state_update);
+    channel.on("endRound", state_update);
     channel.join()
            .receive("ok", state_update)
            .receive("error", resp => { console.log("Unable to join:", resp) })

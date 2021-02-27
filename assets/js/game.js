@@ -56,7 +56,7 @@ export function WaitingRoom({players, observers, userId}) {
     function get_radio(pname, id, observer, ready) {
         return (
             <li key={pname + id}>
-                <p>{pname}</p>
+                <h4 className="title is-size-4">{pname}</h4>
                     <div className="control">
                         <label className="radio">
                             <input 
@@ -108,11 +108,11 @@ export function WaitingRoom({players, observers, userId}) {
     for(const [id, p] of Object.entries(players)) {
         player_states.push(get_radio(p.user, id, false, p.ready));
     }
-    for(const [id, o] of Object.entries(observers)) {
-        player_states.push(get_radio(o, id, true, false));
+    for(const o of observers) {
+        player_states.push(get_radio(o, o, true, false));
     }
     return (
-        <div>
+        <div className="content has-text-centered">
             <ul className="no-marker">
                 {player_states}
             </ul>
@@ -181,45 +181,29 @@ export function ObserverList(observers){
 }
 
 export function ResultList({players}) {
-    let rounds = [];
-    let first = true;
+    let cols = [];
     for(const [_id, pobj] of Object.entries(players)) {
-        let i = 0;
-        for(const r of pobj.guesses) {
-            let result_string = null;
-            if(r) {
-                result_string = pobj.user + " - " + r.guess + ": " + r.bulls + "A" + r.cows + "B";
-            }
-            if (first) {
-                rounds.push([result_string]);
-            } else {
-                rounds[i].push(result_string);
-            }
-            i += 1;
-        }
-        first = false;
+        cols.push((
+            <div className="column">
+                <h3 className="title is-size-3"> {pobj.user} </h3>
+                <ul className="no-marker">
+                    {pobj.guesses.map((result, i) => {
+                        return (
+                            <li key={i}>
+                                <p>{result.guess + ": " + result.bulls + "A" + result.cows + "B"}</p>
+                            </li>
+                        );
+                    })}
+                </ul>
+            </div>
+        ));
     }
-    if(rounds.length === 0) return null;
-    return(
+
+    return (
         <div className="content">
-            <ul className="no-marker">
-                {rounds.map(function(guesses, i){
-                    if(!guesses) return null;
-                    return (
-                        <li key={i}>
-                            <ul className="no-marker">
-                                {guesses.map(function(rstr) {
-                                    return (
-                                        <li key={rstr}>
-                                            <p>{rstr}</p>
-                                        </li>
-                                    );
-                                })}
-                            </ul>
-                        </li>
-                    );
-                })}
-            </ul>
+            <div className="columns">
+                {cols}
+            </div>
         </div>
     );
 }

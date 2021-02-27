@@ -18,6 +18,7 @@ defmodule BullsWeb.GameChannel do
       |> assign(:user, userId)
       # get the game!
       game = GameServer.peek(name)
+      IO.inspect game.answer
       # get a reduced state (no answer)
       view = Game.view(game)
       view = Map.put(view, :user, userId)
@@ -38,14 +39,7 @@ defmodule BullsWeb.GameChannel do
     userId = socket.assigns[:user]
 
     # get the current game state
-    game = GameServer.guess(name, userId, guessArr)
-
-    if game do
-      # just say okay we got it!
-      {:noreply, socket}
-    else
-      {:invalidGuess, socket}
-    end
+    GameServer.guess(name, userId, guessArr)
   end
 
   # It is also common to receive messages from the client and
@@ -60,9 +54,7 @@ defmodule BullsWeb.GameChannel do
     IO.puts userId
 
     # get the game, nil if not enough space for another player
-    IO.puts "modify"
     game = GameServer.modifyUser(name, userId, payload["player"])
-    IO.inspect game
 
     # if game not nil, return ok status
     if game do
@@ -93,7 +85,7 @@ defmodule BullsWeb.GameChannel do
   end
 
 
-  intercept ["view"]
+  intercept ["view", "endRound"]
 
   @impl true
   def handle_out("view", msg, socket) do
@@ -101,6 +93,14 @@ defmodule BullsWeb.GameChannel do
     # msg = %{msg | user: userId}
     msg = Map.put(msg, :user, userId)
     push(socket, "view", msg)
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_out("endRound", msg, socket) do
+    userId = socket.assigns[:user]
+    msg = Map.put(msg, :user, userId)
+    push(socket, "endRound", msg)
     {:noreply, socket}
   end
 

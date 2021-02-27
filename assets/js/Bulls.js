@@ -25,9 +25,9 @@ function Bulls() {
         );
     } else if (gameState.gameState === "waiting") {
         body = (
-            <div>
-                <h1> {gameState.gameName} </h1>
-                <WaitingRoom players={gameState.players} observers={gameState.observers} user={gameState.user} />
+            <div className="content has-text-centered">
+                <h1 className="title is-size-1"> {gameState.gameName} </h1>
+                <WaitingRoom players={gameState.players} observers={gameState.observers} userId={gameState.user} />
             </div>
         );
     } else if (gameState.gameState === "playing"){
@@ -35,7 +35,7 @@ function Bulls() {
             <div>
                <section className="section">
                    <div className="container has-text-centered">
-                       <h1> {gameState.gameName} </h1>
+                       <h1 className="title is-size-1"> {gameState.gameName} </h1>
                        <Timer timeout={timeOut} />
                        <GuessInput enabled={gameState.prevWinners.length === 0} />
                    </div>
@@ -43,7 +43,7 @@ function Bulls() {
                <section className="section">
                    <WinnerList winners={gameState.prevWinners} />
                    <div className="container has-text-centered">
-                       <h1 className="title is-size-2">Guesses:</h1>
+                       <h2 className="title is-size-2">Guesses:</h2>
                        <ResultList players={gameState.players} />
                    </div>
                </section>
