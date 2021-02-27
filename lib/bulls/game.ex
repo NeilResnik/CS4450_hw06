@@ -78,11 +78,9 @@ defmodule Bulls.Game do
     # st: state
     # userId: int
     # player: bool: true if become player, false if become observer
-    # -> return nil if too many players
     def modifyUser(st, userId, player) do
-        # return nil if there are already 4 players
         if countPlayers(st) >= 4 do
-            nil
+          st
         end
 
         # do nothing if game is in  progress
@@ -224,19 +222,20 @@ defmodule Bulls.Game do
     # validate guess, determine bulls and cows
     def addGuess(st, userId, arr) do
         if (st.gameState == "playing") && validGuess?(arr) do
+            IO.inspect st.answer
             # calculate bulls and cows
             bulls = bulls(st.answer, arr, 0)
             cows = cows(st.answer, arr, 0) - bulls
 
             if Map.has_key?(st.pendingGuesses, userId) do
                 # user has already guessed
-                nil
+                st
             else
                 %{ st | pendingGuesses: Map.put(st.pendingGuesses, userId, %{guess: Enum.join(arr, ""), bulls: bulls, cows: cows})}
             end
         else
             # invalid guess just return the old state
-            nil
+            st
         end
     end
 

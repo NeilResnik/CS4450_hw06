@@ -27,7 +27,10 @@ function Bulls() {
         body = (
             <div className="content has-text-centered">
                 <h1 className="title is-size-1"> {gameState.gameName} </h1>
-                <WaitingRoom players={gameState.players} observers={gameState.observers} userId={gameState.user} />
+                    <WaitingRoom players={gameState.players}
+                                 observers={gameState.observers}
+                                 userId={gameState.user}
+                                 winners={gameState.prevWinners}/>
             </div>
         );
     } else if (gameState.gameState === "playing"){

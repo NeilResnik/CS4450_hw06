@@ -52,7 +52,7 @@ export function GameSelect() {
     );
 }
 
-export function WaitingRoom({players, observers, userId}) {
+export function WaitingRoom({players, observers, userId, winners}) {
     function get_radio(pname, id, observer, ready) {
         return (
             <li key={pname + id}>
@@ -111,11 +111,32 @@ export function WaitingRoom({players, observers, userId}) {
     for(const o of observers) {
         player_states.push(get_radio(o, o, true, false));
     }
+    let wlist = null;
+    if(winners.length > 0) {
+        wlist = (
+            <div className="section has-background-primary">
+                <h5 className="title is-size-5">Winners:</h5>
+                <ul className="no-marker">
+                    {winners.map((w) => {
+                        return (
+                            <li key={w}>
+                                <p>{w}</p>
+                            </li>
+                        );
+                    })}
+                </ul>
+            </div>
+        );
+    }
+
     return (
         <div className="content has-text-centered">
-            <ul className="no-marker">
-                {player_states}
-            </ul>
+            {wlist}
+            <div className="section">
+                <ul className="no-marker">
+                    {player_states}
+                </ul>
+            </div>
         </div>
     );
 }
@@ -189,7 +210,7 @@ export function ResultList({players}) {
                 <ul className="no-marker">
                     {pobj.guesses.map((result, i) => {
                         return (
-                            <li key={result.guess+i}>
+                            <li key={result.guess + i.toString()}>
                                 <p>{result.guess + ": " + result.bulls + "A" + result.cows + "B"}</p>
                             </li>
                         );
