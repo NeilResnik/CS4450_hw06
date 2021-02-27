@@ -39,6 +39,8 @@ defmodule BullsWeb.GameChannel do
 
     # get the current game state
     GameServer.guess(name, userId, guessArr)
+
+    {:noreply, socket}
   end
 
   # It is also common to receive messages from the client and
