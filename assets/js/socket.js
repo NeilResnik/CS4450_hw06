@@ -57,7 +57,7 @@ socket.connect()
 // Based on Nat Tuck's code at
 //https://github.com/NatTuck/scratch-2021-01/blob/master/4550/0216/hangman/assets/js/socket.js
 let channel = null;
-let callbacks = [];
+let callback = null;
 
 function convert_state(st) {
     let guesses = [];
@@ -77,23 +77,26 @@ function convert_state(st) {
 }
 
 function state_update(state) {
-    console.log(state)
-    for(const cb of callbacks) {
-        cb(state);
+    if(callback) {
+        callback(state);
     }
 }
 
-export function ch_join(gameName, userName, cbs) {
+export function set_callback(cb) {
+    callback = cb;
+}
+
+export function ch_join(gameName, userName) {
     channel = socket.channel("game:" + gameName, {user: userName})
-    callbacks = callbacks.concat(cbs);
+    channel.on("view", state_update);
     channel.join()
            .receive("ok", state_update)
            .receive("error", resp => { console.log("Unable to join:", resp) })
 }
 
-export function ch_push(guess){
-    channel.push("guess", guess)
-           .receive("view", state_update)
+export function ch_push(key, payload){
+    channel.push(key, payload)
+           .receive("ok", state_update)
            .receive("error", (resp) => {
              console.log("Unable to push:", resp)
            });

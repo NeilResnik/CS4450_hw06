@@ -101,7 +101,11 @@ defmodule Bulls.Game do
                         guesses: []
                     })}
                 else
+                  if st.players[userId] do
+                    st
+                  else
                     raise "trying to convert unkown id into player"
+                  end
                 end
             else
                 # turn a player into an observer

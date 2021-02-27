@@ -10,7 +10,7 @@ function guess(text){
     ch_push("guess", text.split(""));
 }
 
-export function GameSelect({stateSetters}) {
+export function GameSelect() {
     const [gameName, setGameName] = useState("");
     const [userName, setUserName] = useState("");
 
@@ -20,7 +20,7 @@ export function GameSelect({stateSetters}) {
 
     function onKeypress(event) {
         if(event.key === "Enter" && validate()){
-            ch_join(gameName, userName, stateSetters);
+            ch_join(gameName, userName);
         }
     }
 
@@ -44,7 +44,7 @@ export function GameSelect({stateSetters}) {
             </div>
             <div className="control">
                 <button className="button is-primary"
-                        onClick={() => { if(validate()) { ch_join(gameName, userName, stateSetters);  }}}>
+                        onClick={() => { if(validate()) { ch_join(gameName, userName);  }}}>
                     Join Game 
                 </button>
             </div>
@@ -53,18 +53,18 @@ export function GameSelect({stateSetters}) {
 }
 
 export function WaitingRoom({players, observers, user}) {
-    function get_radio(p, id, observer) {
+    function get_radio(pname, id, observer, ready) {
         return (
-            <li key={p + id}>
-                <p>{p.user}</p>
+            <li key={pname + id}>
+                <p>{pname}</p>
                     <div className="control">
                         <label className="radio">
                             <input 
                                 type="radio"
-                                id={p + id + "ready"}
-                                checked={!observer && p.ready}
+                                id={pname + id + "ready"}
+                                checked={!observer && ready}
                                 onChange={() => {
-                                    if(document.getElementById(p + i + "ready").checked) {
+                                    if(document.getElementById(pname + id + "ready").checked) {
                                         ch_push("modifyUser", {player: true});
                                         ch_push("readyUp", {ready: true});
                                     }
@@ -75,10 +75,10 @@ export function WaitingRoom({players, observers, user}) {
                         <label className="radio">
                             <input 
                                 type="radio"
-                                id={p + id + "notready"}
-                                checked={!observer && p.ready}
+                                id={pname + id + "notready"}
+                                checked={!observer && !ready}
                                 onChange={() => {
-                                    if(document.getElementById(p + i + "ready").checked) {
+                                    if(document.getElementById(pname + id + "notready").checked) {
                                         ch_push("modifyUser", {player: true});
                                         ch_push("readyUp", {ready: false});
                                     }
@@ -89,10 +89,10 @@ export function WaitingRoom({players, observers, user}) {
                         <label className="radio">
                             <input 
                                 type="radio"
-                                id={p + id + "observe"}
+                                id={pname + id + "observe"}
                                 checked={observer}
                                 onChange={() => {
-                                    if(document.getElementById(p + i + "ready").checked) {
+                                    if(document.getElementById(pname + id + "observe").checked) {
                                         ch_push("modifyUser", {player: false});
                                     }
                                 }}
@@ -106,10 +106,10 @@ export function WaitingRoom({players, observers, user}) {
 
     let player_states = [];
     for(const [id, p] of Object.entries(players)) {
-        player_states.push(get_radio(p, id, false));
+        player_states.push(get_radio(p.user, id, false, p.ready));
     }
     for(const [id, o] of Object.entries(observers)) {
-        player_states.push(get_radio(p, id, true));
+        player_states.push(get_radio(o, id, true, false));
     }
     return (
         <div>
@@ -154,7 +154,9 @@ export function GuessInput({enabled}) {
             <div className="control">
                 <button className="button is-primary"
                         disabled={!enabled || text.length !== 4}
-                        onClick={() => { guess(text); }}>
+                        onClick={() => { 
+                            guess(text);
+                        }}>
                     Guess 
                 </button>
             </div>
@@ -162,13 +164,13 @@ export function GuessInput({enabled}) {
     );
 }
 
-export function ObserverList({observers}){
+export function ObserverList(observers){
     return (
         <div className="content">
             <ul>
-                {observers.map(function(o, i) {
+                {Object.entries(observers).map(function([id, o]) {
                     return(
-                        <li key={o + i}>
+                        <li key={o + id}>
                             <p>{o}</p>
                         </li>
                     );
@@ -179,34 +181,37 @@ export function ObserverList({observers}){
 }
 
 export function ResultList({players}) {
-    if(players.length < 1) return (<div className="content"></div>);
     let rounds = [];
     let first = true;
-    for(const pobj of players) {
-        let p = pobj.values()[0];
+    for(const [_id, pobj] of Object.entries(players)) {
         let i = 0;
-        for(const r of p.results) {
-            let result_string = p.name + ": " + r.bulls + "A" + r.cows + "B";
+        for(const r of pobj.guesses) {
+            let result_string = null;
+            if(r) {
+                result_string = pobj.user + " - " + r.guess + ": " + r.bulls + "A" + r.cows + "B";
+            }
             if (first) {
-                rounds.append([result_string]);
+                rounds.push([result_string]);
             } else {
-                rounds[i].append(result_string);
+                rounds[i].push(result_string);
             }
             i += 1;
         }
         first = false;
     }
+    if(rounds.length === 0) return null;
     return(
         <div className="content">
             <ul className="no-marker">
-                {rounds.map(function(results, i){
+                {rounds.map(function(guesses, i){
+                    if(!guesses) return null;
                     return (
                         <li key={i}>
                             <ul className="no-marker">
-                                {Object.entries(results).map(function(rstr) {
+                                {guesses.map(function(rstr) {
                                     return (
                                         <li key={rstr}>
-                                            <p>rstr</p>
+                                            <p>{rstr}</p>
                                         </li>
                                     );
                                 })}
@@ -219,19 +224,8 @@ export function ResultList({players}) {
     );
 }
 
-export function get_winners(players) {
-    console.log(players);
-    let winners = [];
-    for(const pobj of players) {
-        let p = pobj.values()[0];
-        if (p.results.length > 0 && p.results[0].bulls === 4) {
-            winners.append(p.name)
-        }
-    }
-    return winners;
-}
-
 export function WinnerList({winners}) {
+    if(winners.length === 0) return null;
     return (
         <div className="content">
             <ul className="no-marker">
@@ -252,12 +246,12 @@ export function Timer({timeout}) {
         return (timeout - Date.now()) / 1000;
     }
 
-    const [timeLeft, setTimeLeft] = useState(get_time_left);
+    const [timeLeft, setTimeLeft] = useState(getTimeLeft());
     useEffect(() => {
         const timer = setTimeout(() => {
             let tl = getTimeLeft();
             if(tl >= 0) {
-                setTimeLeft(tl);
+                setTimeLeft(Math.round(tl));
             } else {
                 setTimeLeft(0);
             }

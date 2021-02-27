@@ -30,6 +30,7 @@ defmodule BullsWeb.GameChannel do
   # by sending replies to requests from the client
   @impl true
   def handle_in("guess", guessArr, socket) do
+    IO.puts "guess"
     # take the user from the socket, have that user guess the guessArr
 
     name = socket.assigns[:game]
@@ -40,7 +41,7 @@ defmodule BullsWeb.GameChannel do
 
     if game do
       # just say okay we got it!
-      {:ok, socket}
+      {:noreply, socket}
     else
       {:invalidGuess, socket}
     end
@@ -50,12 +51,17 @@ defmodule BullsWeb.GameChannel do
   # broadcast to everyone in the current topic (game_channel:lobby).
   @impl true
   def handle_in("modifyUser", payload, socket) do
+    IO.puts "modifyUser"
     # get the gamename and user id
     name = socket.assigns[:game]
+    IO.puts name
     userId = socket.assigns[:user]
+    IO.puts userId
 
     # get the game, nil if not enough space for another player
-    game = GameServer.modifyUser(name, userId, payload.player)
+    IO.puts "modify"
+    game = GameServer.modifyUser(name, userId, payload["player"])
+    IO.inspect game
 
     # if game not nil, return ok status
     if game do
@@ -77,7 +83,7 @@ defmodule BullsWeb.GameChannel do
     name = socket.assigns[:game]
     userId = socket.assigns[:user]
     # set ready!
-    game = GameServer.setReady(name, userId, payload.ready)
+    game = GameServer.setReady(name, userId, payload["ready"])
     # get the viewww
     view = Game.view(game)
     # broadcast view!
@@ -91,7 +97,8 @@ defmodule BullsWeb.GameChannel do
   @impl true
   def handle_out("view", msg, socket) do
     userId = socket.assigns[:user]
-    msg = %{msg | user: userId}
+    # msg = %{msg | user: userId}
+    msg = Map.put(msg, :user, userId)
     push(socket, "view", msg)
     {:noreply, socket}
   end
