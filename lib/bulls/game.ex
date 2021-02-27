@@ -17,7 +17,7 @@ defmodule Bulls.Game do
         # gameState one of readyUp, playing
         %{
             players: %{},
-            observers: %{},
+            observers: [],
             gameState: "waiting",
             answer: [],
             pendingGuesses: %{},
@@ -91,25 +91,17 @@ defmodule Bulls.Game do
         else
         
             if player do
-                # turn an observer into a player
-                name = st.observers[userId]
-                if name do
-                    st = %{st | observers: Map.delete(st.observers, userId)}
-                    %{st | players: Map.put(st.players, userId, %{
-                        user: name,
-                        ready: false,
-                        guesses: []
-                    })}
-                else
-                    raise "trying to convert unkown id into player"
-                end
+                st = %{st | observers: List.delete(st.observers, userId)}
+                %{st | players: Map.put(st.players, userId, %{
+                    ready: false,
+                    guesses: []
+                })}
             else
                 # turn a player into an observer
                 getPlayer = st.players[userId]
                 if getPlayer do
-                    name = getPlayer.user
                     st = %{st | players: Map.delete(st.players, userId)}
-                    %{st | observers: Map.put(st.observers, userId, name)}
+                    %{st | observers: [userId | st.observers]}
                 else
                     raise "trying to convert unkown id into observer"
                 end
@@ -125,9 +117,13 @@ defmodule Bulls.Game do
     # add a new player as an observer!
     # st: state
     # user: string: user name
-    def addObserver(st, user, id) do
-        st = %{st | observers: Map.put(st.observers, id, user)}
-        %{st | leaderboard: Map.put(st.leaderboard, id, %{user: user, wins: 0, losses: 0})}
+    def addObserver(st, user) do
+        if Enum.member?(st.observers, user) do
+            st
+        else
+            st = %{st | observers: [user | st.observers]}
+            %{st | leaderboard: Map.put(st.leaderboard, user, %{wins: 0, losses: 0})}
+        end
     end
 
     # get number of players so far

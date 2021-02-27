@@ -11,7 +11,7 @@ defmodule BullsWeb.GameChannel do
       # either error or start new game
       GameServer.start(name)
       # get the user id and add the user as an observer (to start)
-      userId = GameServer.addObserver(name, payload.user)
+      userId = GameServer.addObserver(name, payload["user"])
       # set the socket to have game name and user id
       socket = socket
       |> assign(:game, name)
@@ -55,7 +55,7 @@ defmodule BullsWeb.GameChannel do
     userId = socket.assigns[:user]
 
     # get the game, nil if not enough space for another player
-    game = GameServer.modifyUser(name, userId, payload.player)
+    game = GameServer.modifyUser(name, userId, payload["player"])
 
     # if game not nil, return ok status
     if game do
@@ -77,7 +77,7 @@ defmodule BullsWeb.GameChannel do
     name = socket.assigns[:game]
     userId = socket.assigns[:user]
     # set ready!
-    game = GameServer.setReady(name, userId, payload.ready)
+    game = GameServer.setReady(name, userId, payload["ready"])
     # get the viewww
     view = Game.view(game)
     # broadcast view!
@@ -86,13 +86,21 @@ defmodule BullsWeb.GameChannel do
   end
 
 
-  intercept ["view"]
+  intercept ["view", "endRound"]
 
   @impl true
   def handle_out("view", msg, socket) do
     userId = socket.assigns[:user]
     msg = %{msg | user: userId}
     push(socket, "view", msg)
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_out("endRound", msg, socket) do
+    userId = socket.assigns[:user]
+    msg = %{msg | user: userId}
+    push(socket, "endRound", msg)
     {:noreply, socket}
   end
 

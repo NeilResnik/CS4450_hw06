@@ -86,14 +86,13 @@ defmodule Bulls.GameServer do
   # add an observer
   def handle_call({:addObserver, _name, user}, _from, game) do
     # add an observer and return th id!
-    id = Game.totalMemberCount(game) + 1
-    game = Game.addObserver(game, user, id)
+    game = Game.addObserver(game, user)
     #BackupAgent.put(name, game)
     BullsWeb.Endpoint.broadcast!(
       "game:#{game.gameName}",
       "view",
       Game.view(game))
-    {:reply, id, game}
+    {:reply, user, game}
   end
 
   # toggle user from player to observer or vice versa
@@ -106,7 +105,7 @@ defmodule Bulls.GameServer do
   end
 
   # toggle the ready state of a player, if all ready then start timer!
-  def handle_call({:setReady, name, userId, ready}, _from, game) do
+  def handle_call({:setReady, _name, userId, ready}, _from, game) do
     game = Game.setReady(game, userId, ready)
     #BackupAgent.put(name, game)
     if game.gameState == "playing" do
@@ -122,7 +121,7 @@ defmodule Bulls.GameServer do
     #BackupAgent.put(name, game)
     BullsWeb.Endpoint.broadcast!(
       "game:#{game.gameName}",
-      "view",
+      "endRound",
       Game.view(game))
     if game.gameState == "playing" do
       # nobody has won, start next timer
