@@ -104,11 +104,9 @@ export function ch_push(key, payload){
 }
 
 export function ch_reset(){
-    channel.push("reset", {})
-           .receive("view", state_update)
-           .receive("error", (resp) => {
-             console.log("Unable to reset:", resp)
-           });
+    channel.leave();
+    channel = null;
+    callback({});
 }
 
 if(channel) {

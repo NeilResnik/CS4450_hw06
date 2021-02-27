@@ -10,6 +10,17 @@ function guess(text){
     ch_push("guess", text.split(""));
 }
 
+export function Back() {
+    return (
+        <div className="control">
+            <button className="button is-danger"
+                    onClick={ch_reset}>
+                Back
+            </button>
+        </div>
+    );
+}
+
 export function GameSelect() {
     const [gameName, setGameName] = useState("");
     const [userName, setUserName] = useState("");
