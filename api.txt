@@ -18,7 +18,6 @@ SOCKET MESSAGES:
 
 
 
-
 Lobby:
     3 States: Ready, Not Ready, Observe - all are sent to server when changed, starts in not ready
 Game:
@@ -26,16 +25,26 @@ Game:
         List of Strings (each string = 1 letter)
 
     view:
+
     {
-        Users: List of Strings,
-        Observers: List of Strings,
-        Guesses: List of (Maps of 
-            {
-                User: string,
-                Guess: string,
-                Bulls: number,
-                Cows: number
-            }), each map = round, front/lower index = more recent
+        user: userId
+        players:
+        {
+            id: {
+                    user: string,
+                    ready: bool,
+                    guesses: [{
+                        guess: string,
+                        bulls: number,
+                        cows: number
+                    }]
+                }
+        },
+        observers: { id: username }
+        prevWinners: [ usernames as strings ]
+        leaderboard: {id: {username: name, wins: int, losses: int}}
+        gameState: "waiting" || "playing"
+        gameName: name
     }
 
     view2 {
@@ -73,20 +82,24 @@ STORE PLAYERS BY ID
 
 
 {
-    players: [{
+
+    players: {
         id: {
-                'user': string,
-                'ready': bool,
-                'guesses': [{
+                user: string,
+                ready: bool,
+                guesses: [{
                     guess: string,
                     bulls: number,
                     cows: number
                 }]
             }
-        ],
-    }]
-    observers: [{id: int, user: string}]
+
+    }
+    observers: {id: name}
     gameState: "waiting" || "playing"
     answer: ["#", "#", "#", "#"]
+    pendingGuesses: {id: { guess: string, bulls: number, cows: number } }
+    prevWinners: [ list of winners ]
+    leaderboard: {id: {user: name, wins: int, losses: int}}
     gameName: name
 }
