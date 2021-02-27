@@ -1,4 +1,4 @@
-defmodule Bulls.GameSup do
+defmodule Bulls_Multiplayer.GameSup do
   use DynamicSupervisor
 
   def start_link(arg) do
@@ -7,7 +7,7 @@ defmodule Bulls.GameSup do
 
   @impl true
   def init(_arg) do
-    {:ok, _} = Registry.start_link(keys: :unique, name: Bulls.GameReg)
+    {:ok, _} = Registry.start_link(keys: :unique, name: Bulls_Multiplayer.GameReg)
     DynamicSupervisor.init(strategy: :one_for_one)
   end
 

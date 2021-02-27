@@ -1,8 +1,8 @@
-defmodule BullsWeb.GameChannel do
-  use BullsWeb, :channel
+defmodule Bulls_MultiplayerWeb.GameChannel do
+  use Bulls_MultiplayerWeb, :channel
 
-  alias Bulls.Game
-  alias Bulls.GameServer
+  alias Bulls_Multiplayer.Game
+  alias Bulls_Multiplayer.GameServer
 
   @impl true
   def join("game:" <> name, payload, socket) do

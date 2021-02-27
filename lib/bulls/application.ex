@@ -1,4 +1,4 @@
-defmodule Bulls.Application do
+defmodule Bulls_Multiplayer.Application do
   # See https://hexdocs.pm/elixir/Application.html
   # for more information on OTP Applications
   @moduledoc false
@@ -8,27 +8,27 @@ defmodule Bulls.Application do
   def start(_type, _args) do
     children = [
       # Start the Telemetry supervisor
-      BullsWeb.Telemetry,
+      Bulls_MultiplayerWeb.Telemetry,
       # Start the PubSub system
-      {Phoenix.PubSub, name: Bulls.PubSub},
+      {Phoenix.PubSub, name: Bulls_Multiplayer.PubSub},
       # Start the Endpoint (http/https)
-      BullsWeb.Endpoint,
-      # Start a worker by calling: Bulls.Worker.start_link(arg)
-      # {Bulls.Worker, arg}
-      # Bulls.BackupAgent,
-      Bulls.GameSup
+      Bulls_MultiplayerWeb.Endpoint,
+      # Start a worker by calling: Bulls_Multiplayer.Worker.start_link(arg)
+      # {Bulls_Multiplayer.Worker, arg}
+      # Bulls_Multiplayer.BackupAgent,
+      Bulls_Multiplayer.GameSup
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
-    opts = [strategy: :one_for_one, name: Bulls.Supervisor]
+    opts = [strategy: :one_for_one, name: Bulls_Multiplayer.Supervisor]
     Supervisor.start_link(children, opts)
   end
 
   # Tell Phoenix to update the endpoint configuration
   # whenever the application is updated.
   def config_change(changed, _new, removed) do
-    BullsWeb.Endpoint.config_change(changed, removed)
+    Bulls_MultiplayerWeb.Endpoint.config_change(changed, removed)
     :ok
   end
 end

@@ -9,7 +9,7 @@
 # guess -> adds a guess to guess history
 # bullsAndCows -> check how many bulls and cows there are
 # validateGuess -> check for no repeating vals
-defmodule Bulls.Game do
+defmodule Bulls_Multiplayer.Game do
 
     # I think that game state should store players
     # each player has a game history

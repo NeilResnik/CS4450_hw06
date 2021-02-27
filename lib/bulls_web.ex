@@ -1,12 +1,12 @@
-defmodule BullsWeb do
+defmodule Bulls_MultiplayerWeb do
   @moduledoc """
   The entrypoint for defining your web interface, such
   as controllers, views, channels and so on.
 
   This can be used in your application as:
 
-      use BullsWeb, :controller
-      use BullsWeb, :view
+      use Bulls_MultiplayerWeb, :controller
+      use Bulls_MultiplayerWeb, :view
 
   The definitions below will be executed for every view,
   controller, etc, so keep them short and clean, focused
@@ -19,11 +19,11 @@ defmodule BullsWeb do
 
   def controller do
     quote do
-      use Phoenix.Controller, namespace: BullsWeb
+      use Phoenix.Controller, namespace: Bulls_MultiplayerWeb
 
       import Plug.Conn
-      import BullsWeb.Gettext
-      alias BullsWeb.Router.Helpers, as: Routes
+      import Bulls_MultiplayerWeb.Gettext
+      alias Bulls_MultiplayerWeb.Router.Helpers, as: Routes
     end
   end
 
@@ -31,7 +31,7 @@ defmodule BullsWeb do
     quote do
       use Phoenix.View,
         root: "lib/bulls_web/templates",
-        namespace: BullsWeb
+        namespace: Bulls_MultiplayerWeb
 
       # Import convenience functions from controllers
       import Phoenix.Controller,
@@ -54,7 +54,7 @@ defmodule BullsWeb do
   def channel do
     quote do
       use Phoenix.Channel
-      import BullsWeb.Gettext
+      import Bulls_MultiplayerWeb.Gettext
     end
   end
 
@@ -66,9 +66,9 @@ defmodule BullsWeb do
       # Import basic rendering functionality (render, render_layout, etc)
       import Phoenix.View
 
-      import BullsWeb.ErrorHelpers
-      import BullsWeb.Gettext
-      alias BullsWeb.Router.Helpers, as: Routes
+      import Bulls_MultiplayerWeb.ErrorHelpers
+      import Bulls_MultiplayerWeb.Gettext
+      alias Bulls_MultiplayerWeb.Router.Helpers, as: Routes
     end
   end
 

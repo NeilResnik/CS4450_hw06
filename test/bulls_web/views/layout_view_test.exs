@@ -1,5 +1,5 @@
-defmodule BullsWeb.LayoutViewTest do
-  use BullsWeb.ConnCase, async: true
+defmodule Bulls_MultiplayerWeb.LayoutViewTest do
+  use Bulls_MultiplayerWeb.ConnCase, async: true
 
   # When testing helpers, you may want to import Phoenix.HTML and
   # use functions such as safe_to_string() to convert the helper

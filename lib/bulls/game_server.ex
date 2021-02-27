@@ -1,13 +1,13 @@
 # based on code from Nat's scratch repo
-defmodule Bulls.GameServer do
+defmodule Bulls_Multiplayer.GameServer do
   use GenServer
 
-  #alias Bulls.BackupAgent
-  alias Bulls.Game
+  #alias Bulls_Multiplayer.BackupAgent
+  alias Bulls_Multiplayer.Game
 
   # public interface
   def reg(name) do
-    {:via, Registry, {Bulls.GameReg, name}}
+    {:via, Registry, {Bulls_Multiplayer.GameReg, name}}
   end
 
   def start(name) do
@@ -17,7 +17,7 @@ defmodule Bulls.GameServer do
       restart: :permanent,
       type: :worker
     }
-    Bulls.GameSup.start_child(spec)
+    Bulls_Multiplayer.GameSup.start_child(spec)
   end
 
   def start_link(name) do
@@ -88,7 +88,7 @@ defmodule Bulls.GameServer do
     # add an observer and return th id!
     game = Game.addObserver(game, user)
     #BackupAgent.put(name, game)
-    BullsWeb.Endpoint.broadcast!(
+    Bulls_MultiplayerWeb.Endpoint.broadcast!(
       "game:#{game.gameName}",
       "view",
       Game.view(game))
@@ -119,7 +119,7 @@ defmodule Bulls.GameServer do
   def handle_info(:doGuesses, game) do
     game = Game.doGuesses(game)
     #BackupAgent.put(name, game)
-    BullsWeb.Endpoint.broadcast!(
+    Bulls_MultiplayerWeb.Endpoint.broadcast!(
       "game:#{game.gameName}",
       "endRound",
       Game.view(game))

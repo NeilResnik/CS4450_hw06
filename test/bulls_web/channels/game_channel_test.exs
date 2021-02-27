@@ -1,11 +1,11 @@
-defmodule BullsWeb.GameChannelTest do
-  use BullsWeb.ChannelCase
+defmodule Bulls_MultiplayerWeb.GameChannelTest do
+  use Bulls_MultiplayerWeb.ChannelCase
 
   setup do
     {:ok, _, socket} =
-      BullsWeb.UserSocket
+      Bulls_MultiplayerWeb.UserSocket
       |> socket("user_id", %{some: :assign})
-      |> subscribe_and_join(BullsWeb.GameChannel, "game:lobby")
+      |> subscribe_and_join(Bulls_MultiplayerWeb.GameChannel, "game:lobby")
 
     %{socket: socket}
   end

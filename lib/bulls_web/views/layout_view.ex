@@ -1,3 +1,3 @@
-defmodule BullsWeb.LayoutView do
-  use BullsWeb, :view
+defmodule Bulls_MultiplayerWeb.LayoutView do
+  use Bulls_MultiplayerWeb, :view
 end

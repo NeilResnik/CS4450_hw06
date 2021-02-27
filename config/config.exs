@@ -8,11 +8,11 @@
 use Mix.Config
 
 # Configures the endpoint
-config :bulls, BullsWeb.Endpoint,
+config :bulls_multiplayer, Bulls_MultiplayerWeb.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "4aDq76sxflH3NeESR6YqVEPy4v7ZQiETxAbi9Q+d/3JHmNQRMJbvxS1awswpHufE",
-  render_errors: [view: BullsWeb.ErrorView, accepts: ~w(html json), layout: false],
-  pubsub_server: Bulls.PubSub,
+  render_errors: [view: Bulls_MultiplayerWeb.ErrorView, accepts: ~w(html json), layout: false],
+  pubsub_server: Bulls_Multiplayer.PubSub,
   live_view: [signing_salt: "MWw369rS"]
 
 # Configures Elixir's Logger

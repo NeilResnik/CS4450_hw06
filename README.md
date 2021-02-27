@@ -10,7 +10,7 @@
   - gameState (playing, won, or lost)
 
 
-# Bulls
+# Bulls_Multiplayer
 
 To start your Phoenix server:
 

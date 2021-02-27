@@ -1,5 +1,5 @@
-defmodule BullsWeb.Endpoint do
-  use Phoenix.Endpoint, otp_app: :bulls
+defmodule Bulls_MultiplayerWeb.Endpoint do
+  use Phoenix.Endpoint, otp_app: :bulls_multiplayer
 
   # The session will be stored in the cookie and signed,
   # this means its contents can be read but not tampered with.
@@ -10,7 +10,7 @@ defmodule BullsWeb.Endpoint do
     signing_salt: "U4gddMYj"
   ]
 
-  socket "/socket", BullsWeb.UserSocket,
+  socket "/socket", Bulls_MultiplayerWeb.UserSocket,
     websocket: true,
     longpoll: false
 
@@ -22,7 +22,7 @@ defmodule BullsWeb.Endpoint do
   # when deploying your static files in production.
   plug Plug.Static,
     at: "/",
-    from: :bulls,
+    from: :bulls_multiplayer,
     gzip: false,
     only: ~w(css fonts images js favicon.ico robots.txt)
 
@@ -49,5 +49,5 @@ defmodule BullsWeb.Endpoint do
   plug Plug.MethodOverride
   plug Plug.Head
   plug Plug.Session, @session_options
-  plug BullsWeb.Router
+  plug Bulls_MultiplayerWeb.Router
 end

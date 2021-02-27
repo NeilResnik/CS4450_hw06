@@ -1,5 +1,5 @@
 # based on code from Nat's scratch Repo
-defmodule Bulls.BackupAgent do
+defmodule Bulls_Multiplayer.BackupAgent do
   use Agent
 
   def start_link(_arg) do
