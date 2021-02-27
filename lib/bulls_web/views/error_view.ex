@@ -1,5 +1,5 @@
-defmodule BullsWeb.ErrorView do
-  use BullsWeb, :view
+defmodule Bulls_MultiplayerWeb.ErrorView do
+  use Bulls_MultiplayerWeb, :view
 
   # If you want to customize a particular status code
   # for a certain format, you may uncomment below.

@@ -14,9 +14,6 @@ SOCKET MESSAGES:
     -> "tooManyUsers" response if it would cause more than 4 players
 "readyUp", {ready: boolean} -> call to toggle if a player is ready (toggle only visible if user is a player?)
 "guess", [guessArr] ->  called when a user guesses
-                    -> does not return a state update!
-                    -> returns "ok" or "invalidGuess" (either incorrect length/chars or guessed during "waiting" state or user has already guessed this round)
-
 
 
 
@@ -50,6 +47,24 @@ Game:
         gameName: name
     }
 
+    view2 {
+        players:
+        [{
+            id: {
+                    'user': string,
+                    'ready': bool,
+                    'guesses': [{
+                        guess: string,
+                        bulls: number,
+                        cows: number
+                    }]
+                }
+        }],
+        observers: [{id: int, user: string}]
+
+        gameState: "waiting" || "playing"
+    }
+
 
     GAME STATES: "waiting", "playing"
      - server tells the clients if they should display the lobby or the game
@@ -67,6 +82,7 @@ STORE PLAYERS BY ID
 
 
 {
+
     players: {
         id: {
                 user: string,
@@ -77,6 +93,7 @@ STORE PLAYERS BY ID
                     cows: number
                 }]
             }
+
     }
     observers: {id: name}
     gameState: "waiting" || "playing"

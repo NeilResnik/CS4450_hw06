@@ -1,4 +1,4 @@
-defmodule BullsWeb.ConnCase do
+defmodule Bulls_MultiplayerWeb.ConnCase do
   @moduledoc """
   This module defines the test case to be used by
   tests that require setting up a connection.
@@ -11,7 +11,7 @@ defmodule BullsWeb.ConnCase do
   we enable the SQL sandbox, so changes done to the database
   are reverted at the end of every test. If you are using
   PostgreSQL, you can even run database tests asynchronously
-  by setting `use BullsWeb.ConnCase, async: true`, although
+  by setting `use Bulls_MultiplayerWeb.ConnCase, async: true`, although
   this option is not recommended for other databases.
   """
 
@@ -22,12 +22,12 @@ defmodule BullsWeb.ConnCase do
       # Import conveniences for testing with connections
       import Plug.Conn
       import Phoenix.ConnTest
-      import BullsWeb.ConnCase
+      import Bulls_MultiplayerWeb.ConnCase
 
-      alias BullsWeb.Router.Helpers, as: Routes
+      alias Bulls_MultiplayerWeb.Router.Helpers, as: Routes
 
       # The default endpoint for testing
-      @endpoint BullsWeb.Endpoint
+      @endpoint Bulls_MultiplayerWeb.Endpoint
     end
   end
 

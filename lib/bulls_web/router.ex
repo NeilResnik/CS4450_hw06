@@ -1,5 +1,5 @@
-defmodule BullsWeb.Router do
-  use BullsWeb, :router
+defmodule Bulls_MultiplayerWeb.Router do
+  use Bulls_MultiplayerWeb, :router
 
   pipeline :browser do
     plug :accepts, ["html"]
@@ -13,14 +13,14 @@ defmodule BullsWeb.Router do
     plug :accepts, ["json"]
   end
 
-  scope "/", BullsWeb do
+  scope "/", Bulls_MultiplayerWeb do
     pipe_through :browser
 
     get "/", PageController, :index
   end
 
   # Other scopes may use custom stacks.
-  # scope "/api", BullsWeb do
+  # scope "/api", Bulls_MultiplayerWeb do
   #   pipe_through :api
   # end
 
@@ -36,7 +36,7 @@ defmodule BullsWeb.Router do
 
     scope "/" do
       pipe_through :browser
-      live_dashboard "/dashboard", metrics: BullsWeb.Telemetry
+      live_dashboard "/dashboard", metrics: Bulls_MultiplayerWeb.Telemetry
     end
   end
 end

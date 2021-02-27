@@ -1,45 +1,68 @@
 import 'bulma/css/bulma.css'
 import '../css/app.scss'
-import React, { useState, useEffect } from 'react';
-import { GuessInput, GuessList } from './game'
-import { ch_join } from './socket'
+import React, { useEffect, useState } from 'react';
+import { Back, GameSelect, GuessInput, ResultList, Timer, WaitingRoom, WinnerList } from './game'
+import { set_callback } from './socket'
 
 function Bulls() {
-    const [gameState, setGameState] = useState({
-        guesses: [],
-        results: [],
-    });
+    const [gameState, setGameState] = useState({});
+    const [timeOut, setTimeOut] = useState(0);
 
     useEffect(() => {
-        ch_join(setGameState);
-    });
+        set_callback((st) => {
+            setTimeOut(Date.now() + 30000);
+            console.log(st);
+            setGameState(st);
+        });
+    }, []);
 
-    let notificationClassName = "notification";
-    if(gameState.results[0] === "4A0B") {
-        notificationClassName += " is-primary";
-    } else if(gameState.guesses.length >= 8){
-        notificationClassName += " is-danger";
-    } else {
-        notificationClassName += " is-hidden";
+    let body = null;
+    if (Object.entries(gameState).length === 0) {
+        body = (
+            <div className="content">
+                <GameSelect />
+            </div>
+        );
+    } else if (gameState.gameState === "waiting") {
+        body = (
+            <div className="content">
+                <div>
+                    <Back />
+                </div>
+                <div className="has-text-centered">
+                    <h1 className="title is-size-1"> {gameState.gameName} </h1>
+                        <WaitingRoom players={gameState.players}
+                                     observers={gameState.observers}
+                                     userId={gameState.user}
+                                     winners={gameState.prevWinners}/>
+                </div>
+            </div>
+        );
+    } else if (gameState.gameState === "playing"){
+        body = (
+            <div className="content">
+                <Back />
+               <section className="section">
+                   <div className="container has-text-centered">
+                       <h1 className="title is-size-1"> {gameState.gameName} </h1>
+                       <Timer timeout={timeOut} />
+                       <GuessInput enabled={gameState.prevWinners.length === 0} />
+                   </div>
+               </section>
+               <section className="section">
+                   <WinnerList winners={gameState.prevWinners} />
+                   <div className="container has-text-centered">
+                       <h2 className="title is-size-2">Guesses:</h2>
+                       <ResultList players={gameState.players} />
+                   </div>
+               </section>
+           </div>
+        );
     }
 
     return (
         <div className="Bulls">
-           <section className="section">
-               <div className="container has-text-centered">
-                    <div className={notificationClassName}>
-                        {gameState.results[0] === "4A0B" ? "You Won!" : "You Lost!"}
-                    </div>
-                   <GuessInput enabled={gameState.results[0] !== "4A0B" && gameState.guesses.length < 8}/>
-                    <p className="is-size-3">Lives: {8 - gameState.guesses.length}</p>
-               </div>
-           </section>
-           <section className="section">
-               <div className="container has-text-centered">
-                   <h1 className="title is-size-2">Guesses:</h1>
-                   <GuessList guesses={gameState.guesses} results={gameState.results} />
-               </div>
-           </section>
+            {body}
         </div>
     );
 }

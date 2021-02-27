@@ -1,5 +1,5 @@
-defmodule BullsWeb.PageControllerTest do
-  use BullsWeb.ConnCase
+defmodule Bulls_MultiplayerWeb.PageControllerTest do
+  use Bulls_MultiplayerWeb.ConnCase
 
   test "GET /", %{conn: conn} do
     conn = get(conn, "/")

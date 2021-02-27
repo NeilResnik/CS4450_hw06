@@ -1,6 +1,6 @@
-defmodule Bulls do
+defmodule Bulls_Multiplayer do
   @moduledoc """
-  Bulls keeps the contexts that define your domain
+  Bulls_Multiplayer keeps the contexts that define your domain
   and business logic.
 
   Contexts are also responsible for managing your data, regardless

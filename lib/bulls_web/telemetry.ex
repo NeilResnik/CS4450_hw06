@@ -1,4 +1,4 @@
-defmodule BullsWeb.Telemetry do
+defmodule Bulls_MultiplayerWeb.Telemetry do
   use Supervisor
   import Telemetry.Metrics
 
@@ -42,7 +42,7 @@ defmodule BullsWeb.Telemetry do
     [
       # A module, function and arguments to be invoked periodically.
       # This function must call :telemetry.execute/3 and a metric must be added above.
-      # {BullsWeb, :count_users, []}
+      # {Bulls_MultiplayerWeb, :count_users, []}
     ]
   end
 end
