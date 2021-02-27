@@ -189,7 +189,7 @@ export function ResultList({players}) {
                 <ul className="no-marker">
                     {pobj.guesses.map((result, i) => {
                         return (
-                            <li key={i}>
+                            <li key={result.guess+i}>
                                 <p>{result.guess + ": " + result.bulls + "A" + result.cows + "B"}</p>
                             </li>
                         );

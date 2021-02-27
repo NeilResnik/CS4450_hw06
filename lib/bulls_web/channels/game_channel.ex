@@ -18,7 +18,6 @@ defmodule BullsWeb.GameChannel do
       |> assign(:user, userId)
       # get the game!
       game = GameServer.peek(name)
-      IO.inspect game.answer
       # get a reduced state (no answer)
       view = Game.view(game)
       view = Map.put(view, :user, userId)
