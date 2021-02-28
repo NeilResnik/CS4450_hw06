@@ -2,7 +2,7 @@
 // The MiniCssExtractPlugin is used to separate it out into
 // its own CSS file.
 import 'bulma/css/bulma.css'
-import '../css/app.scss'
+import '../css/app.css'
 
 // webpack automatically bundles all modules in your
 // entry points. Those entry points can be configured

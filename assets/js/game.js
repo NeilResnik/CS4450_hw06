@@ -1,5 +1,5 @@
 import 'bulma/css/bulma.css'
-import '../css/app.scss'
+import '../css/app.css'
 import React, { useState } from 'react';
 import { ch_push, ch_reset } from './socket';
 

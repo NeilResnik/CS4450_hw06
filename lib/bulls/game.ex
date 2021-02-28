@@ -118,7 +118,7 @@ defmodule Bulls.Game do
     # st: state
     # user: string: user name
     def addObserver(st, user) do
-        if Enum.member?(st.observers, user) do
+        if Enum.member?(st.observers, user) || Map.has_key?(st.players, user) do
             st
         else
             st = %{st | observers: [user | st.observers]}

@@ -112,7 +112,12 @@ defmodule Bulls.GameServer do
       Process.send_after(self(), :doGuesses, 30_000)
       {:ok, game}
     end
-    {:reply, game, game}
+    # do this to start timer
+    BullsWeb.Endpoint.broadcast!(
+      "game:" <> game.gameName,
+      "endRound",
+      Game.view(game))
+    {:noreply, game}
   end
 
   # TODO modify this to pass a guess
@@ -120,7 +125,7 @@ defmodule Bulls.GameServer do
     game = Game.doGuesses(game)
     #BackupAgent.put(name, game)
     BullsWeb.Endpoint.broadcast!(
-      "game:#{game.gameName}",
+      "game:" <> game.gameName,
       "endRound",
       Game.view(game))
     if game.gameState == "playing" do

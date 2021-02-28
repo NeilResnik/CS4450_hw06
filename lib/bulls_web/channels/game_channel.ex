@@ -20,6 +20,7 @@ defmodule BullsWeb.GameChannel do
       game = GameServer.peek(name)
       # get a reduced state (no answer)
       view = Game.view(game)
+      view = Map.put(view, :user, userId)
       {:ok, view, socket}
     else
       {:error, %{reason: "unauthorized"}}
@@ -40,9 +41,9 @@ defmodule BullsWeb.GameChannel do
 
     if game do
       # just say okay we got it!
-      {:ok, socket}
+      {:noreply, socket}
     else
-      {:invalidGuess, socket}
+      {:noreply, socket}
     end
   end
 
@@ -91,7 +92,7 @@ defmodule BullsWeb.GameChannel do
   @impl true
   def handle_out("view", msg, socket) do
     userId = socket.assigns[:user]
-    msg = %{msg | user: userId}
+    msg = Map.put(msg, :user, userId)
     push(socket, "view", msg)
     {:noreply, socket}
   end
@@ -99,7 +100,8 @@ defmodule BullsWeb.GameChannel do
   @impl true
   def handle_out("endRound", msg, socket) do
     userId = socket.assigns[:user]
-    msg = %{msg | user: userId}
+    msg = Map.put(msg, :user, userId)
+    msg = Map.put(msg, :end, DateTime.utc_now() |> DateTime.add(30, :second))
     push(socket, "endRound", msg)
     {:noreply, socket}
   end

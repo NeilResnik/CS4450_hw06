@@ -1,11 +1,3 @@
-// NOTE: The contents of this file will only be executed if
-// you uncomment its entry in "assets/js/app.js".
-
-// To use Phoenix channels, the first step is to import Socket,
-// and connect at the socket path in "lib/web/endpoint.ex".
-//
-// Pass the token on params as below. Or remove it
-// from the params if you are not using authentication.
 import {Socket} from "phoenix"
 
 let socket = new Socket("/socket", {params: {token: ""}})
@@ -54,65 +46,58 @@ let socket = new Socket("/socket", {params: {token: ""}})
 // Finally, connect to the socket:
 socket.connect()
 
-// Now that you are connected, you can join channels with a topic:
-let channel = socket.channel("game:1", {})
-
 // Based on Nat Tuck's code at
 //https://github.com/NatTuck/scratch-2021-01/blob/master/4550/0216/hangman/assets/js/socket.js
-let state = {
-    guesses: [],
-    results: [],
-};
-
+let channel = null;
 let callback = null;
+let restartTimer = null;
 
-function convert_state(st) {
-    let guesses = [];
-    let results = [];
-    for (const record of st.guessHistory){
-        if(record.guess) {
-            guesses.unshift(record.guess);
-        }
-        if(record.bulls && record.cows) {
-            results.unshift(record.bulls + "A" + record.cows + "B");
-        }
-    }
-    return {
-        guesses: guesses,
-        results: results
-    }
-}
-
-function state_update(st) {
-    st = convert_state(st)
-    state = st;
-    console.log(state)
-    if(callback) {
-      callback(st);
-    }
-}
-
-export function ch_join(cb){
-    callback = cb;
+function state_update(state) {
+    console.log(state);
     callback(state);
 }
 
-export function ch_push(guess){
+function end_round(state) {
+    console.log('round over:')
+    console.log(state);
+    callback(state);
+    restartTimer(state.end);
+}
+
+export function ch_join(gameName, userName, cb, rt) {
+    channel = socket.channel("game:" + gameName, {user: userName})
+    callback = cb
+    restartTimer = rt
+    channel.join()
+           .receive("ok", state_update)
+           .receive("error", resp => { console.log("Unable to join:", resp) })
+    channel.on("view", state_update);
+    channel.on("endRound", end_round);
+}
+
+export function ch_guess(guess){
     channel.push("guess", guess)
-           .receive("ok", state_update)
+           /*.receive("ok", (resp) => {
+                console.log("guess went through!", resp)
+            })
            .receive("error", (resp) => {
-             console.log("Unable to push:", resp)
+             console.log("Unable to guess:", resp)
+           });*/
+}
+
+export function ch_modifyUser(player){
+    channel.push("modifyUser", {player: player})
+           .receive("view", state_update)
+           .receive("tooManyPlayers", state_update)
+           .receive("error", (resp) => {
+             console.log("err:", resp)
            });
 }
 
-export function ch_reset(){
-    channel.push("reset", {})
-           .receive("ok", state_update)
+export function ch_readyUp(ready){
+    channel.push("readyUp", {ready: ready})
+           .receive("view", state_update)
            .receive("error", (resp) => {
-             console.log("Unable to reset:", resp)
+             console.log("err:", resp)
            });
 }
-
-channel.join()
-       .receive("ok", state_update)
-       .receive("error", resp => { console.log("Unable to join:", resp) })
